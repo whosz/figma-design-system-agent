@@ -1,0 +1,97 @@
+---
+name: showcase-pages
+description: >
+  Generate shareable static pages that present the project itself: a
+  component gallery page rendering every created component in all its states
+  and breakpoints, and a project summary page (what was built, metrics,
+  timeline, links to prototypes). Use when the user asks for "a page with our
+  components", "component gallery/showcase", "styleguide page", "project
+  summary page", wants something to show stakeholders, or at the end of a
+  milestone alongside docs-and-metrics.
+---
+
+# Showcase Pages
+
+Where `docs-and-metrics` produces markdown for the repo, this skill produces
+**presentable HTML** for humans outside the repo: designers, stakeholders,
+clients. Two page types, both built *with the design system itself* — the
+showcase is dogfooding; if the gallery page looks off, the DS has a problem
+worth knowing about.
+
+Both outputs follow the `file://`-safe rules from `publish-prototype`
+(classic scripts, relative paths, no CDNs, assets copied in), so they can be
+zipped and emailed or deployed with `/publish` like any prototype.
+
+## Page 1 — Component gallery (`showcase/components.html`)
+
+Data sources: `design-system/library-manifest.json` (or the components
+directory when no manifest exists), token files, `validate-extraction`'s
+state matrix, Code Connect status.
+
+For every component:
+
+- **Live rendering of every state** — default, hover, focus, pressed,
+  disabled, error, loading… each as a separately rendered, labeled instance
+  (forced-state classes), not a "hover to see it" demo — the gallery must
+  show all states at a glance and in print/screenshot form. Components with
+  missing states render a visible "state missing" placeholder rather than
+  silently skipping — gaps should be embarrassing, that's how they get
+  fixed.
+- Variant axes shown as a grid when small (size × type), collapsible when
+  combinatorial.
+- Per component: usage snippet matching the target profile, token list it
+  consumes, Code Connect link status, last-validated date.
+- Gallery header: token swatch board (colors, type scale, spacing scale)
+  rendered from the token files, DS version/date, source Figma file link.
+- Navigation: sidebar index, search-as-you-filter (vanilla JS, file://-safe).
+
+## Page 2 — Project summary (`showcase/project-summary.html`)
+
+Data sources: `reports/work-log.jsonl`, latest metrics report, validation
+and fidelity reports, `flows/docs/*.mermaid`, prototype index.
+
+Sections:
+
+- **What was built**: counts and lists — components, prototypes (with
+  thumbnails from their breakpoint screenshots when available), flows
+  (rendered diagrams), docs generated.
+- **Quality status**: latest validation/fidelity verdicts per artifact,
+  token coverage %, open findings count — sourced from reports, never
+  recomputed here (this page reports, it doesn't audit).
+- **Effort**: agent time per phase and LLM token usage, carrying the same
+  `client-reported`/`estimated` basis labels as `docs-and-metrics` — labels
+  must survive into the page, not be polished away for stakeholders.
+- **Timeline**: sessions/milestones from the work log.
+- **Next steps**: open DS gaps, source gaps routed to designers, planned
+  items — pulled from the various reports' follow-up sections.
+- Audience switch: `--audience=stakeholder` (default; plain language, no
+  file paths) or `--audience=team` (adds artifact paths, skill names, raw
+  report links).
+
+## Workflow
+
+1. Verify data sources exist; missing ones degrade the page gracefully with
+   an explicit "no data yet — run <skill>" note in place of the section.
+2. Generate into `showcase/` with shared assets in `showcase/assets/`
+   (copied token CSS, screenshots, fonts).
+3. Run the `file://` headless verification (same gate as
+   `publish-prototype` Tier 1).
+4. Report paths + offer `/publish showcase` for an online version.
+
+## Hard rules
+
+1. Generated views only — regenerable from artifacts, "generated" header,
+   never the place to hand-edit content.
+2. Every state of every interactive component appears in the gallery —
+   missing states show as visible gaps, never silent omissions.
+3. The summary page cites reports; it never invents or recomputes verdicts
+   and never strips basis labels from metrics.
+4. `file://`-safe always; deploys only via `publish-prototype`'s
+   confirmation gate.
+5. Styling comes from the DS tokens — no showcase-only color palette.
+
+## Example invocations
+
+- "Generate the component gallery page"
+- "/showcase summary --audience=stakeholder"
+- "Make a page I can send the client showing everything we built this month"

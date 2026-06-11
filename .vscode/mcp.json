@@ -1,0 +1,17 @@
+{
+  // Figma MCP server — pick ONE mode:
+  // LOCAL (default): requires Figma desktop app running with
+  //   "Enable local MCP server" turned on in Preferences.
+  // REMOTE: comment out "figma" below, uncomment "figma-remote",
+  //   then reload the window and complete the OAuth prompt.
+  "servers": {
+    "figma": {
+      "type": "http",
+      "url": "http://127.0.0.1:3845/mcp"
+    }
+    // ,"figma-remote": {
+    //   "type": "http",
+    //   "url": "https://mcp.figma.com/mcp"
+    // }
+  }
+}

@@ -1,0 +1,14 @@
+# ingested internal documents — never commit by default (AGENTS.md rule 10)
+knowledge/*
+!knowledge/.gitkeep
+
+# build & publish artifacts
+dist/
+node_modules/
+
+# personal work log (teams may opt in by removing this line)
+reports/work-log.jsonl
+
+# OS noise
+.DS_Store
+Thumbs.db
