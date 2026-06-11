@@ -89,6 +89,7 @@ Bidirectional design-system workflow between Figma and code:
 | 0 Setup | `target-profile-setup` | decide output tech + target devices, persist profile |
 | 0 Setup | `adopt-component-repo` | adopt an existing code library as default DS |
 | 0 Setup | `figma-readiness-check` | audit the Figma file before first extraction |
+| 0 Setup | `detect-icon-library` | find icon library in Figma/code; ask for link if not found |
 | 0 Setup | `design-system-search` | natural-language queries over extracted tokens & components |
 | 1 Extract | `extract-design-system` | Figma variables → tokens; component inventory |
 | 1 Extract | `extract-app-flows` | prototype interactions / FigJam → flow graphs |
@@ -114,6 +115,7 @@ graph TD
         TP[target-profile-setup]
         AR[adopt-component-repo]
         FR[figma-readiness-check]
+        DIL[detect-icon-library]
         DSS[design-system-search]
     end
     subgraph P1["Phase 1 — Extraction"]
@@ -146,6 +148,10 @@ graph TD
     EDS -->|tokens + inventory| VE
     EDS -->|tokens + inventory| DSS
     EDS -->|tokens + inventory| EIC
+    FR -->|icon warning| DIL
+    EDS -->|icon components| DIL
+    DIL -->|icon-library.json| GC
+    DIL -->|icon import pattern| EIC
     EAF -->|flow graphs| VE
     VE -->|validated data| GC
     GC --> BRP

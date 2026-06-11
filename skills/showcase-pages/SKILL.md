@@ -24,6 +24,12 @@ zipped and emailed or deployed with `/publish` like any prototype.
 
 ## Page 1 — Component gallery (`showcase/components.html`)
 
+**One file, all components.** The gallery is a single self-contained HTML
+file — never split into per-component files. Navigation is in-page only:
+a sticky sidebar index and a search-as-you-filter input (vanilla JS,
+`file://`-safe). Linking to an individual component uses a URL fragment
+(`#button`, `#input`), not a separate page.
+
 Data sources: `design-system/library-manifest.json` (or the components
 directory when no manifest exists), token files, `validate-extraction`'s
 state matrix, Code Connect status.
@@ -43,7 +49,9 @@ For every component:
   consumes, Code Connect link status, last-validated date.
 - Gallery header: token swatch board (colors, type scale, spacing scale)
   rendered from the token files, DS version/date, source Figma file link.
-- Navigation: sidebar index, search-as-you-filter (vanilla JS, file://-safe).
+- Navigation: sticky sidebar index with all component names as anchor links,
+  search-as-you-filter input (vanilla JS, `file://`-safe) that hides
+  non-matching sections.
 
 ## Page 2 — Project summary (`showcase/project-summary.html`)
 
@@ -89,6 +97,10 @@ Sections:
 4. `file://`-safe always; deploys only via `publish-prototype`'s
    confirmation gate.
 5. Styling comes from the DS tokens — no showcase-only color palette.
+6. **Single file per output page.** `showcase/components.html` contains
+   ALL components; never generate per-component HTML files. In-page
+   navigation only (anchors + JS filter). Sharing a component means sharing
+   a URL fragment, not a separate URL.
 
 ## Example invocations
 
