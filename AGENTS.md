@@ -89,6 +89,7 @@ Bidirectional design-system workflow between Figma and code:
 | 0 Setup | `target-profile-setup` | decide output tech + target devices, persist profile |
 | 0 Setup | `adopt-component-repo` | adopt an existing code library as default DS |
 | 0 Setup | `figma-readiness-check` | audit the Figma file before first extraction |
+| 0 Setup | `design-system-search` | natural-language queries over extracted tokens & components |
 | 1 Extract | `extract-design-system` | Figma variables → tokens; component inventory |
 | 1 Extract | `extract-app-flows` | prototype interactions / FigJam → flow graphs |
 | 1 Extract | `knowledge-ingest` | SharePoint/Confluence/Drive/Miro docs → knowledge cache |
@@ -102,6 +103,7 @@ Bidirectional design-system workflow between Figma and code:
 | 4 Output | `publish-prototype` | serverless `file://` bundle + optional online deploy |
 | 4 Output | `showcase-pages` | component gallery page + project summary page |
 | 4 Output | `docs-and-metrics` | docs, token usage stats, time & LLM-token metrics |
+| 4 Output | `export-ide-context` | design system → `.designrules.md` for Cursor/Windsurf/@file |
 
 ## Dependency graph
 
@@ -112,6 +114,7 @@ graph TD
         TP[target-profile-setup]
         AR[adopt-component-repo]
         FR[figma-readiness-check]
+        DSS[design-system-search]
     end
     subgraph P1["Phase 1 — Extraction"]
         EDS[extract-design-system]
@@ -133,6 +136,7 @@ graph TD
         PP[publish-prototype]
         SP[showcase-pages]
         DM[docs-and-metrics]
+        EIC[export-ide-context]
     end
 
     MD --> FR
@@ -140,9 +144,12 @@ graph TD
     TP --> GC & BRP & DTP & PP
     AR -->|library-manifest| GC & BRP & CCS & CTF
     EDS -->|tokens + inventory| VE
+    EDS -->|tokens + inventory| DSS
+    EDS -->|tokens + inventory| EIC
     EAF -->|flow graphs| VE
     VE -->|validated data| GC
     GC --> BRP
+    GC -->|components| EIC
     KI -->|knowledge cache| DTP
     EAF -->|wiring| BRP
     BRP --> DFA
@@ -161,6 +168,9 @@ graph TD
 Reading the graph: arrows mean "produces input for". `mcp-doctor` precedes
 any long pipeline; `validate-extraction` sits between extraction and
 generation; everything feeds the work log consumed by `docs-and-metrics`.
+`design-system-search` is a read-only utility available any time after
+`extract-design-system`. `export-ide-context` is typically run once after
+extraction or component generation to refresh the IDE context file.
 
 ## Named pipelines
 
