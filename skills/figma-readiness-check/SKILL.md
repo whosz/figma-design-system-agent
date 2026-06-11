@@ -42,13 +42,36 @@ instead of producing a readiness report.
   text styles, and spacing reference variables/styles, or raw values? Estimate
   the ratio. >30% raw values = warning; >70% = blocker.
 
+**Dedicated library page** (opportunity — checked first)
+
+Call `get_metadata` on the file to list all pages. Look for pages whose
+names suggest a component or variable library: `Components`, `Library`,
+`Design System`, `Variables`, `Tokens`, `Foundations`, `Style Guide`,
+`UI Kit`, or close variants.
+
+- **Found**: record the page name(s) in the report as **Library pages** and
+  mark them as the primary extraction source for `extract-design-system`.
+  Also check whether those pages contain component descriptions and
+  documentation text frames (free-standing text near components) — if yes,
+  note that `extract-design-system` will capture them automatically.
+- **Not found automatically**: ask the user before continuing:
+
+  > "I didn't find a dedicated components or variables page in this Figma
+  > file. Does one exist? If so, please share its URL or page name so
+  > extraction can prioritize it and pull any descriptions or documentation
+  > alongside the components and tokens."
+
+  Wait for the answer. If the user confirms there is no such page, proceed
+  with a whole-file scan and note it in the report.
+
 **Components** (blocker for `prototyping`)
 - Are repeated UI elements actual components, or copy-pasted frames?
   Use `search_design_system` for obvious names (button, input, card, modal,
   nav). Zero hits on a UI file = blocker.
 - Do components use variants for states, or exist as disconnected
   near-duplicates (`button-hover-final-v2`)?
-- Do components have descriptions? (warning only)
+- Do components have descriptions? (warning only — if yes, `extract-design-system`
+  will capture them)
 
 **Structure & naming**
 - Auto layout coverage on sampled frames: absolute-positioned screens are a

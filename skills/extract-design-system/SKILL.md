@@ -32,7 +32,16 @@ their job.
    off to `mcp-doctor`.
 2. First run on this file ever? Recommend `figma-readiness-check` first;
    if the user declines, proceed best-effort and say so.
-3. `design-system/library-manifest.json` exists (an adopted code library)?
+3. **Dedicated library page**: check `design-system/docs/figma-readiness-report.md`
+   for a recorded "Library pages" entry. If not present, call `get_metadata`
+   to scan page names (same logic as `figma-readiness-check`). If a dedicated
+   page is found, set it as the **primary extraction scope** for components
+   and variable descriptions. If not found and the readiness check wasn't run,
+   ask the user once:
+   > "Does this Figma file have a dedicated components or variables page?
+   > Share its URL or page name and I'll use it as the primary source."
+   If the user says no, proceed with a whole-file scan.
+4. `design-system/library-manifest.json` exists (an adopted code library)?
    Token extraction then runs in **reconcile mode**: the manifest's
    conflict decisions apply, and components are inventoried for *mapping*,
    not regeneration (per AGENTS.md resolution order).
@@ -81,9 +90,22 @@ local components) and for each, via `get_design_context`:
 - Token references per property — the inventory stores *token names*, raw
   values only where the design itself is raw (each one flagged).
 - Per-entry metadata: Figma node id, component key, last-modified, link.
+- **Descriptions and documentation** (extracted when present):
+  - Component description field (Figma's built-in description on each
+    component / component set) → stored in `inventory.json` as
+    `description`.
+  - Annotation text frames on the dedicated library page — free-standing
+    text nodes placed near a component that document its usage, behaviour
+    or design decisions → stored as `docs` (array of strings, in reading
+    order). If none, the field is omitted rather than set to `[]`.
+  - Variable descriptions from `get_variable_defs` → stored per-token in
+    `tokens.json` under `$description`.
+  These fields are included verbatim — never paraphrased or summarized
+  (AGENTS.md provenance rule 8).
 
 Output: `design-system/inventory.json` + human-readable
-`design-system/docs/inventory.md` (table: component × axes × states).
+`design-system/docs/inventory.md` (table: component × axes × states,
+with description column where populated).
 
 ## Step 3 — Assets
 

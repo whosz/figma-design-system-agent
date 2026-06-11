@@ -39,7 +39,24 @@ component without all of its states is not done.
 
 ## Workflow
 
-### Step 1 — Read the spec
+### Step 1 — Confirm Figma source page, then read the spec
+
+Before reading the spec, verify that a direct Figma source for this
+component is known. Check in order:
+1. Was a Figma URL or page name provided in this request?
+2. Does `inventory.json` carry a `figma_link` for this component?
+3. Was a dedicated library page recorded in `design-system/docs/figma-readiness-report.md`?
+
+If none of the above resolves to a concrete page, ask the user once:
+
+> "Do you have a Figma page or frame URL for the **\<ComponentName\>**
+> component? Sharing it lets me pull the latest design context directly.
+> If not, I'll proceed from the extracted inventory."
+
+Wait for the reply. If the user provides a URL, use it as the primary
+`get_design_context` source and refresh the inventory entry before
+generating. If the user says no or skips, proceed from the existing
+inventory entry — note it in the output as `[source: inventory only]`.
 
 From the inventory: variant axes and values, the per-state styling deltas,
 properties/slots, sub-component dependencies, token references. Generate
@@ -94,7 +111,7 @@ Cross-tier invariants:
   role/name, touch targets ≥ 44px when the profile includes touch.
 - Text content slots accept real content; no baked-in lorem ipsum.
 
-### Step 4 — Self-check, document, log
+### Step 4 — Self-check, document, log, update showcase
 
 1. Render all states via forced classes in a headless browser (when
    available); compare against the Step-1 screenshots — gross mismatches
@@ -106,6 +123,12 @@ Cross-tier invariants:
    table, the state implementation table, token list consumed.
 4. Update `library-manifest.json` (the component now exists at resolution
    level 2) and append the work-log entry.
+5. **Regenerate `showcase/components.html`** automatically — no user
+   confirmation needed (it is a local generated view, not a publish action).
+   If the file does not exist yet, create it from scratch. If it exists,
+   regenerate it in full so the newly added component is included with all
+   its states. This step runs silently; report only the updated path at the
+   end: "↻ showcase/components.html updated."
 
 ## Hard rules
 
