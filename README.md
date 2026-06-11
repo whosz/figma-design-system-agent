@@ -1,8 +1,9 @@
 # Figma Design System Agent
 
-**v0.1** — an AI agent toolkit that turns Figma into working design systems
+**v0.1.3** — an AI agent toolkit that turns Figma into working design systems
 and responsive prototypes, and back again. Works in GitHub Copilot
-(VS Code & cloud), Claude Code, and any MCP-capable AI client.
+(VS Code & cloud), Claude Code, Cursor, Windsurf, Cline, and any
+MCP-capable AI client.
 
 ## What it does
 
@@ -40,7 +41,10 @@ and [`skills/`](skills/) (one instruction file per capability).
 2. **Connect the Figma MCP server** — config files are pre-wired:
    - VS Code / Copilot: `.vscode/mcp.json`
    - Claude Code: `.mcp.json`
-   Pick local or remote mode by uncommenting the matching entry, then
+   - Cursor: `.cursor/rules/figma-agent.mdc` (rules auto-applied)
+   - Windsurf: `.windsurfrules`
+   - Cline: `.clinerules`
+   Pick local or remote MCP mode by uncommenting the matching entry, then
    restart/reload your client.
 3. **Verify**: ask the agent to *"test the MCP connections"*
    (`mcp-doctor`). You want a green status table before anything else.
@@ -74,20 +78,23 @@ summary"` — shareable pages built with your own design system.
 | `mcp-doctor` | diagnose & smoke-test MCP connections | ✅ |
 | `target-profile-setup` | choose output tech + target devices, persist as profile | ✅ |
 | `adopt-component-repo` | use an existing code library as the default DS | ✅ |
-| `figma-readiness-check` | audit Figma file quality before extraction | ✅ |
-| `extract-design-system` | Figma variables/components → tokens + inventory | ✅ |
+| `figma-readiness-check` | audit Figma file quality; detect dedicated component/variable pages | ✅ |
+| `detect-icon-library` | find icon library in Figma or code; ask for link if not found | ✅ |
+| `design-system-search` | natural-language queries over extracted tokens & components | ✅ |
+| `extract-design-system` | Figma variables/components → tokens + inventory + descriptions | ✅ |
 | `extract-app-flows` | read prototype flows / FigJam → flow graph → wired app | ✅ |
 | `knowledge-ingest` | ingest SharePoint / Confluence / Drive / Miro docs | ✅ |
 | `validate-extraction` | verify extracted data vs. live Figma, incl. all states | ✅ |
-| `generate-component` | Figma component → code component, all states | ✅ |
+| `generate-component` | Figma component → code component, all states; auto-updates gallery | ✅ |
 | `build-rwd-prototype` | compose responsive prototypes from components | ✅ |
 | `docs-to-prototype` | prototypes from notes/boards when no design exists | ✅ |
 | `code-to-figma` | push prototypes/components back into Figma | ✅ |
 | `design-fidelity-audit` | implementation vs. design, severity-graded report | ✅ |
 | `code-connect-sync` | map Figma components ↔ code (on demand) | ✅ |
 | `publish-prototype` | serverless `file://` bundle + optional online deploy | ✅ |
-| `showcase-pages` | component gallery page + project summary page | ✅ |
+| `showcase-pages` | single-page component gallery + project summary page | ✅ |
 | `docs-and-metrics` | docs, token usage stats, time & token metrics | ✅ |
+| `export-ide-context` | design system → `.designrules.md` for Cursor/Windsurf @file | ✅ |
 
 ## The guarantees (short version of AGENTS.md)
 
@@ -112,7 +119,8 @@ the problem is on.
 
 ## Roadmap
 
-- **v0.1**: all 17 skills complete, template published
+- **v0.1.x**: 20 skills complete; multi-tool support (Cursor, Windsurf,
+  Cline); icon library detection; IDE context export; single-page gallery
 - **v0.2**: skill test suites (eval prompts per skill), example Figma file
   + walkthrough
 - **v0.3**: theming/multi-brand token modes, CI workflow running
