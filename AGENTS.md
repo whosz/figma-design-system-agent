@@ -154,6 +154,7 @@ graph TD
     DIL -->|icon import pattern| EIC
     EAF -->|flow graphs| VE
     VE -->|validated data| GC
+    GC -->|auto| SP
     GC --> BRP
     GC -->|components| EIC
     KI -->|knowledge cache| DTP
@@ -174,16 +175,20 @@ graph TD
 Reading the graph: arrows mean "produces input for". `mcp-doctor` precedes
 any long pipeline; `validate-extraction` sits between extraction and
 generation; everything feeds the work log consumed by `docs-and-metrics`.
-`design-system-search` is a read-only utility available any time after
-`extract-design-system`. `export-ide-context` is typically run once after
-extraction or component generation to refresh the IDE context file.
+`generate-component` auto-regenerates `showcase-pages` after every build
+(dashed `auto` edge) — direct invocation of `showcase-pages` is for forced
+refresh or the project-summary page only. `design-system-search` is a
+read-only utility available any time after `extract-design-system`.
+`export-ide-context` is typically run once after extraction or component
+generation to refresh the IDE context file.
 
 ## Named pipelines
 
 - **Bootstrap from Figma** (the default first run):
   `mcp-doctor` → `target-profile-setup` → `figma-readiness-check` →
-  `extract-design-system` → `validate-extraction` → `generate-component`
-  (per component) → `showcase-pages` (gallery)
+  `detect-icon-library` → `extract-design-system` → `validate-extraction`
+  → `generate-component` (per component; showcase auto-regenerated each
+  time) → `export-ide-context` (optional, for IDE @file context)
 - **Prototype a designed screen**:
   `build-rwd-prototype` → `design-fidelity-audit` → `publish-prototype`
 - **Whole app from Figma flows**:
