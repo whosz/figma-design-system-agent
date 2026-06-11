@@ -186,10 +186,16 @@ generation; everything feeds the work log consumed by `docs-and-metrics`.
 
 - **VS Code / GitHub Copilot**: MCP config in `.vscode/mcp.json`; prompt
   files in `.github/prompts/*.prompt.md` invoke skills via `/name`; agent
-  definitions in `.github/agents/`. After MCP config changes, reload the
+  definitions in `.github/agents/`. Instructions in
+  `.github/copilot-instructions.md`. After MCP config changes, reload the
   window.
 - **Claude Code**: MCP config in `.mcp.json`; skills are auto-discovered
   from `skills/*/SKILL.md`; `CLAUDE.md` points to this file.
+- **Cursor**: rules in `.cursor/rules/figma-agent.mdc` (always-apply).
+- **Windsurf**: rules in `.windsurfrules`.
+- **Cline**: rules in `.clinerules`.
+- **OpenAI Codex CLI / other agents**: `AGENTS.md` (this file) is
+  auto-loaded.
 - **Other MCP-capable clients**: configure the Figma MCP server per the
   client's docs; this file plus `skills/` are client-agnostic.
 
