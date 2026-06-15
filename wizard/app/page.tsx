@@ -50,8 +50,8 @@ const FEATURES = [
 ]
 
 /* ── Theme tokens ── */
-const BLUE = '#2563EB'
-const BLUE_HOVER = '#1D4ED8'
+const BLUE = '#9747FF'
+const BLUE_HOVER = '#8035f0'
 
 function useTheme() {
   const [dark, setDark] = useState(true)
