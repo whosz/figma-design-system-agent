@@ -38,6 +38,22 @@ available rather than free text):
 - `web-components` — framework-agnostic custom elements; for DS libraries
   meant to be consumed by multiple stacks.
 
+**1b. CSS approach** (follow-up only when tier is `static-site` or
+`framework-app`):
+
+- `plain-css` (default) — CSS custom properties from the extracted tokens,
+  one file per component.
+- `tailwind` — Tailwind CSS utility classes; `extract-design-system` also
+  generates a `tailwind.config.js` mapping every design token to a Tailwind
+  theme key (colors, spacing, font sizes, border radius, shadows). When
+  adopted, record `cssApproach: "tailwind"` in the profile and all
+  generating skills emit utility classes instead of `var(--token)` calls.
+- `css-modules` / `styled-components` / other — record the approach; skills
+  use the library's idiom rather than plain CSS.
+
+If the user's stack already implies an approach ("Next.js + Tailwind" →
+`framework-app` + `tailwind`), infer it and confirm in one line.
+
 **2. Target devices & constraints**
 
 - Device classes: mobile / tablet / desktop / large-screen (TV, kiosk) —
@@ -47,8 +63,10 @@ available rather than free text):
 - Browser floor: evergreen (default) or a named legacy constraint
 - Offline requirement: none (default) / must work offline (`static-file`
   implies yes by nature)
-- Accessibility target: WCAG 2.1 AA by default; ask only if the user raises
-  it or the domain demands more (public sector → AA is non-negotiable)
+- Accessibility target: WCAG 2.2 AA by default; ask only if the user raises
+  it or the domain demands more (public sector → AA is non-negotiable;
+  WCAG 2.2 adds focus appearance, target size, and accessible authentication
+  criteria over 2.1 — default to 2.2 for all new projects)
 
 If the user's original request already answers something ("client will open
 it from email" → `static-file`; "this goes into our Next.js app" →
@@ -60,15 +78,19 @@ it from email" → `static-file`; "this goes into our Next.js app" →
 {
   "version": 1,
   "decidedAt": "2026-06-11",
-  "output": { "tier": "static-file", "framework": null },
+  "output": { "tier": "static-file", "framework": null, "cssApproach": "plain-css" },
   "devices": ["mobile", "desktop"],
   "input": "both",
   "browserFloor": "evergreen",
   "offline": true,
-  "a11y": "WCAG21AA",
+  "a11y": "WCAG22AA",
   "notes": "Client reviews by email; no server available."
 }
 ```
+
+`cssApproach` defaults to `"plain-css"`. Set to `"tailwind"` to enable
+`tailwind.config.js` generation from tokens and utility-class output in all
+generating skills.
 
 Plus a short `design-system/docs/target-profile.md` explaining the choices
 in plain language for teammates.

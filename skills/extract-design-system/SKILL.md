@@ -32,6 +32,19 @@ their job.
    off to `mcp-doctor`.
 2. First run on this file ever? Recommend `figma-readiness-check` first;
    if the user declines, proceed best-effort and say so.
+2a. **Showcase page preference** (ask once per project, before extraction
+    starts): unless `target-profile.json` already contains a
+    `showcaseAutoUpdate` field, ask the user:
+    > "As I extract and generate components, should I automatically
+    > maintain a component gallery page (`showcase/components.html`) so
+    > you always have an up-to-date visual overview? (yes / no)"
+    - `yes` (default) → set `showcaseAutoUpdate: true` in
+      `target-profile.json`; `generate-component` will regenerate the
+      gallery after each component build.
+    - `no` → set `showcaseAutoUpdate: false`; the gallery is only built
+      when `showcase-pages` is invoked explicitly.
+    If the field already exists, skip the question and respect the saved
+    preference.
 3. **Dedicated library page**: check `design-system/docs/figma-readiness-report.md`
    for a recorded "Library pages" entry. If not present, call `get_metadata`
    to scan page names (same logic as `figma-readiness-check`). If a dedicated
@@ -56,13 +69,24 @@ Fetch `get_variable_defs` for the full file and transform:
 - **Naming**: Figma's `collection/group/name` hierarchy maps 1:1 to token
   names — `color/primary/600` → `--color-primary-600`. Record the mapping
   convention in the output header; never "improve" designer naming.
-- **Outputs** (both, kept in sync):
+- **Outputs** (all kept in sync; formats generated based on `target-profile.json`):
   - `design-system/tokens/*.css` — one file per collection; modes as
     `[data-theme="dark"]` / `prefers-color-scheme` blocks (per target
-    profile when it exists)
-  - `design-system/tokens/tokens.json` — W3C Design Tokens format with
-    `$type`/`$value`, aliases preserved as references (Figma variable
-    aliases → token references, never flattened to raw values)
+    profile when it exists). Always generated.
+  - `design-system/tokens/tokens.json` — W3C Design Tokens / DTCG format
+    with `$type`/`$value`/`$description`, aliases preserved as references
+    (Figma variable aliases → token references, never flattened). Always
+    generated.
+  - `design-system/tokens/*.scss` — SCSS variables (`$color-primary-600:
+    #2563eb;`) with a `@forward` barrel file. Generated when
+    `cssApproach` is `scss` or when explicitly requested.
+  - `design-system/tokens/tokens.ts` — TypeScript `as const` object
+    (`export const tokens = { color: { primary: { 600: '#2563eb' } } }
+    as const`) with inferred types. Generated when the target tier is
+    `framework-app` or when explicitly requested.
+  - `design-system/tokens/tailwind.config.js` — Tailwind theme extension
+    mapping every token to a Tailwind key. Generated when `cssApproach`
+    is `tailwind`.
 - **Units**: px values kept as authored plus a documented rem conversion
   (base recorded in `tokens.json` `$extensions`); colors normalized to a
   single format (hex / oklch — ask once on first run, record the choice).

@@ -91,7 +91,8 @@ Bidirectional design-system workflow between Figma and code:
 | 0 Setup | `figma-readiness-check` | audit the Figma file before first extraction |
 | 0 Setup | `detect-icon-library` | find icon library in Figma/code; ask for link if not found |
 | 0 Setup | `design-system-search` | natural-language queries over extracted tokens & components |
-| 1 Extract | `extract-design-system` | Figma variables → tokens; component inventory |
+| 1 Extract | `figma-version-diff` | diff live Figma vs. last extraction; changelog before re-run |
+| 1 Extract | `extract-design-system` | Figma variables → tokens (CSS/SCSS/TS/Tailwind); component inventory |
 | 1 Extract | `extract-app-flows` | prototype interactions / FigJam → flow graphs |
 | 1 Extract | `knowledge-ingest` | SharePoint/Confluence/Drive/Miro docs → knowledge cache |
 | 1 Extract | `validate-extraction` | verify extracted data vs. live Figma (incl. state matrix) |
@@ -119,6 +120,7 @@ graph TD
         DSS[design-system-search]
     end
     subgraph P1["Phase 1 — Extraction"]
+        FVD[figma-version-diff]
         EDS[extract-design-system]
         EAF[extract-app-flows]
         KI[knowledge-ingest]
@@ -143,6 +145,7 @@ graph TD
 
     MD --> FR
     FR --> EDS
+    FVD -->|impact report| EDS
     TP --> GC & BRP & DTP & PP
     AR -->|library-manifest| GC & BRP & CCS & CTF
     EDS -->|tokens + inventory| VE
@@ -177,10 +180,12 @@ any long pipeline; `validate-extraction` sits between extraction and
 generation; everything feeds the work log consumed by `docs-and-metrics`.
 `generate-component` auto-regenerates `showcase-pages` after every build
 (dashed `auto` edge) — direct invocation of `showcase-pages` is for forced
-refresh or the project-summary page only. `design-system-search` is a
-read-only utility available any time after `extract-design-system`.
-`export-ide-context` is typically run once after extraction or component
-generation to refresh the IDE context file.
+refresh or the project-summary page only. `figma-version-diff` is an
+on-demand read-only check run before re-extraction to understand the scope
+of designer changes; its impact report feeds `extract-design-system` in
+update mode. `design-system-search` is a read-only utility available any
+time after `extract-design-system`. `export-ide-context` is typically run
+once after extraction or component generation to refresh the IDE context file.
 
 ## Named pipelines
 
@@ -189,6 +194,10 @@ generation to refresh the IDE context file.
   `detect-icon-library` → `extract-design-system` → `validate-extraction`
   → `generate-component` (per component; showcase auto-regenerated each
   time) → `export-ide-context` (optional, for IDE @file context)
+- **Update after designer changes**:
+  `figma-version-diff` (scope the changes) → `extract-design-system`
+  (update mode) → `validate-extraction` → `generate-component` (affected
+  components only)
 - **Prototype a designed screen**:
   `build-rwd-prototype` → `design-fidelity-audit` → `publish-prototype`
 - **Whole app from Figma flows**:

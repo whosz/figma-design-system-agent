@@ -1,6 +1,6 @@
 # Figma Design System Agent
 
-**v0.1.3** — an AI agent toolkit that turns Figma into working design systems
+**v0.1.4** — an AI agent toolkit that turns Figma into working design systems
 and responsive prototypes, and back again. Works in GitHub Copilot
 (VS Code & cloud), Claude Code, Cursor, Windsurf, Cline, and any
 MCP-capable AI client.
@@ -56,20 +56,24 @@ language; slash-prompts are listed per skill in `skills/*/SKILL.md`.
 
 1. `"Test the MCP connections"` — fail fast if Figma isn't reachable.
 2. `"Set up the target profile"` — one short Q&A: what code to generate
-   (default: HTML+CSS that opens straight from a file) and which devices to
-   target. Saved to `design-system/target-profile.json`.
+   (default: HTML+CSS that opens from a file), CSS approach (plain CSS,
+   Tailwind, SCSS, …), and which devices to target. Saved to
+   `design-system/target-profile.json`.
 3. *(optional)* `"We already have components in <path> — use them"` —
    adopts your existing library as the default instead of generating one.
 4. `"Check if our Figma file is ready: <link>"` — readiness report with a
-   designer-friendly fix list.
-5. `"Extract the design system from <link>"` then `"Validate the
-   extraction"` — tokens + component inventory, verified against live
-   Figma including the per-state coverage matrix.
+   designer-friendly fix list; detects dedicated component/variable pages.
+5. `"Extract the design system from <link>"` — the agent asks if you want
+   an auto-maintained component gallery, detects the icon library, pulls
+   tokens (CSS + SCSS + TypeScript + Tailwind config) and the full component
+   inventory including descriptions and documentation from Figma.
+   Then `"Validate the extraction"`.
 6. `"Build a responsive prototype of <screen>"` → `"Audit it against the
    design"` → `"Package it so the client can open it without a server"`.
 
-Wrap up any milestone with `"Generate the component gallery and project
-summary"` — shareable pages built with your own design system.
+To check what changed in Figma since last extraction: `"What changed in
+Figma since last time?"` — runs `figma-version-diff` and tells you exactly
+what to re-extract before regenerating.
 
 ## Skill catalog
 
@@ -81,7 +85,8 @@ summary"` — shareable pages built with your own design system.
 | `figma-readiness-check` | audit Figma file quality; detect dedicated component/variable pages | ✅ |
 | `detect-icon-library` | find icon library in Figma or code; ask for link if not found | ✅ |
 | `design-system-search` | natural-language queries over extracted tokens & components | ✅ |
-| `extract-design-system` | Figma variables/components → tokens + inventory + descriptions | ✅ |
+| `figma-version-diff` | diff live Figma vs. last extraction; changelog before re-run | ✅ |
+| `extract-design-system` | tokens → CSS/SCSS/TS/Tailwind + component inventory + descriptions | ✅ |
 | `extract-app-flows` | read prototype flows / FigJam → flow graph → wired app | ✅ |
 | `knowledge-ingest` | ingest SharePoint / Confluence / Drive / Miro docs | ✅ |
 | `validate-extraction` | verify extracted data vs. live Figma, incl. all states | ✅ |
@@ -108,6 +113,7 @@ summary"` — shareable pages built with your own design system.
   after you explicitly confirm in chat.
 - Reports distinguish measurements from estimates and facts from
   assumptions — always.
+- WCAG 2.2 AA accessibility floor on all generated code by default.
 
 ## Troubleshooting
 
@@ -119,8 +125,9 @@ the problem is on.
 
 ## Roadmap
 
-- **v0.1.x**: 20 skills complete; multi-tool support (Cursor, Windsurf,
-  Cline); icon library detection; IDE context export; single-page gallery
+- **v0.1.x**: 21 skills; multi-tool support (Cursor, Windsurf, Cline);
+  SCSS/TS/Tailwind token export; Figma version diff; WCAG 2.2; Plugin API
+  correctness rules; showcase preference; icon library detection
 - **v0.2**: skill test suites (eval prompts per skill), example Figma file
   + walkthrough
 - **v0.3**: theming/multi-brand token modes, CI workflow running

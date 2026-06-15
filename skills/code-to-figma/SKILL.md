@@ -48,6 +48,32 @@ value. A pixel-accurate but frozen "screenshot rebuilt in Figma" is a failure.
 - `breakpoints` (optional): which RWD variants to generate; defaults to the
   breakpoints defined in `design-system/docs/breakpoints.md`
 
+## Plugin API rules (applies to every `use_figma` call)
+
+These are hard technical requirements of Figma's Plugin API. Violating them
+causes silent failures or runtime errors that are hard to diagnose.
+
+| Rule | Correct | Wrong |
+|---|---|---|
+| **Colors** | `{ r: 1, g: 0, b: 0 }` (0–1 range) | `{ r: 255, g: 0, b: 0 }` |
+| **Fills / strokes** | clone array, modify clone, reassign | mutate in place |
+| **Text content** | `await figma.loadFontAsync(…)` then set `.characters` | set `.characters` without loading font |
+| **Page switch** | `await figma.setCurrentPageAsync(page)` | `figma.currentPage = page` |
+| **Output** | `return nodeId` / `return { ids: […] }` | `console.log(…)` (invisible) |
+| **Variable — color** | `node.setBoundVariableForPaint('fills', var)` | hardcoded fill value |
+| **Variable — spacing** | `node.setBoundVariable('paddingLeft', var)` | hardcoded number |
+| **SVG icons** | `figma.createNodeFromSvg(svgString)` | reconstructing paths manually |
+
+Additional rules:
+- **One section per `use_figma` call.** Never build multiple sections in one
+  script; batch *dependency imports* inside a section with `Promise.all()`,
+  but keep sections separate.
+- **Scripts are atomic.** A failed execution leaves the file unchanged — stop,
+  read the error, fix the script, retry. Never retry blindly.
+- **Append nodes before setting sizing modes** (`layoutSizingHorizontal` /
+  `layoutSizingVertical` must be set after the node is inside a frame).
+- **Maximum one `setCurrentPageAsync` per script invocation.**
+
 ## Workflow
 
 ### Step 1 — Parse the source into an intermediate representation

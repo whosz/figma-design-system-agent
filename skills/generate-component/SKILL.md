@@ -123,12 +123,13 @@ Cross-tier invariants:
    table, the state implementation table, token list consumed.
 4. Update `library-manifest.json` (the component now exists at resolution
    level 2) and append the work-log entry.
-5. **Regenerate `showcase/components.html`** automatically — no user
-   confirmation needed (it is a local generated view, not a publish action).
-   If the file does not exist yet, create it from scratch. If it exists,
-   regenerate it in full so the newly added component is included with all
-   its states. This step runs silently; report only the updated path at the
-   end: "↻ showcase/components.html updated."
+5. **Regenerate `showcase/components.html`** — only when
+   `target-profile.json` has `showcaseAutoUpdate: true` (set during
+   `extract-design-system` pre-flight). If the flag is absent or `false`,
+   skip this step silently. When enabled: if the file does not exist yet,
+   create it from scratch; if it exists, regenerate it in full so the newly
+   added component is included with all its states. Report only the updated
+   path at the end: "↻ showcase/components.html updated."
 
 ## Hard rules
 

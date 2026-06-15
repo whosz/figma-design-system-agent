@@ -32,6 +32,14 @@ generation of a complete application with working navigation.
 
 ### Step 1 — Extract raw flow signals
 
+> **MCP availability note.** Prototype interaction metadata (reactions,
+> destinations, transitions) is available via the **remote** Figma MCP
+> server (`mcp.figma.com`). The **local** Dev Mode MCP server (Figma
+> desktop) has limited or no access to prototype connections — it focuses
+> on design properties, not wiring. If the local server is active and
+> prototype data comes back empty, tell the user and suggest either
+> switching to the remote server or providing a FigJam flow diagram instead.
+
 In priority order, merging results:
 
 1. **Prototype interactions** — for each screen frame, read the design
