@@ -1,6 +1,6 @@
 # Figma Design System Agent
 
-**v0.1.4** — an AI agent toolkit that turns Figma into working design systems
+**v0.2.0** — an AI agent toolkit that turns Figma into working design systems
 and responsive prototypes, and back again. Works in GitHub Copilot
 (VS Code & cloud), Claude Code, Cursor, Windsurf, Cline, and any
 MCP-capable AI client.
@@ -130,7 +130,7 @@ an AI client — just a browser. Designed for designers and developers who
 prefer a visual workflow.
 
 **Live page:** [whosz.github.io/figma-design-system-agent](https://whosz.github.io/figma-design-system-agent/)
-(landing page only; the wizard itself requires a local backend — see below)
+(landing page only; full wizard functionality requires running locally — see below)
 
 ### Steps
 
@@ -145,46 +145,49 @@ prefer a visual workflow.
 7. **Export** — download ZIP, deploy to GitHub Pages, or export AI
    instruction files for Cursor / Windsurf / Claude Code
 
-> **Note:** Full AI functionality (streaming, key validation, Figma MCP)
-> requires the wizard to run locally. Only Anthropic supports Figma MCP
-> live integration; other providers show a warning and skip MCP-dependent
-> steps.
+> **Note:** Only Anthropic supports Figma MCP live integration. Other
+> providers (OpenAI, Gemini, Copilot) render a warning and skip
+> MCP-dependent steps.
 
 ### Run locally
 
 | Platform | Command |
 |---|---|
 | macOS / Linux | `./start-wizard.sh` |
-| Windows (cmd) | `start-wizard.bat` |
+| Windows | `start-wizard.bat` |
 
-Both scripts can be run from the repo root or from `wizard/`. On first run
-they create `wizard/.env.local` from `.env.example`, install dependencies
-if needed, and start the dev server at **http://localhost:3000**.
+Run from the repo root or from `wizard/`. On first run the script:
+- Creates `wizard/.env.local` from `.env.example` (fill in your keys)
+- Installs Node dependencies if missing
+- Starts the dev server and **opens `http://localhost:3000/wizard/1`
+  automatically** once ready
 
-macOS requires Node.js ≥ 20 (`brew install node`).
-Windows requires Node.js ≥ 20 from [nodejs.org](https://nodejs.org).
+Requires **Node.js ≥ 20**: `brew install node` (macOS) or
+[nodejs.org](https://nodejs.org) (Windows).
 
 ### Environment variables (`wizard/.env.local`)
 
 | Variable | Required | Description |
 |---|---|---|
-| `ANTHROPIC_API_KEY` | optional | Server-side fallback key; users can bring their own in Step 1 |
+| `ANTHROPIC_API_KEY` | optional | Server-side fallback; users can bring their own key in Step 1 |
 | `FIGMA_CLIENT_ID` | for OAuth | From [figma.com/developers/apps](https://www.figma.com/developers/apps) |
 | `FIGMA_CLIENT_SECRET` | for OAuth | Same app |
 | `NEXTAUTH_SECRET` | for OAuth | `openssl rand -base64 32` |
 | `NEXTAUTH_URL` | for OAuth | `http://localhost:3000` (local) or your deploy URL |
 
 PAT (Personal Access Token) mode works without the Figma OAuth variables.
+The wizard detects automatically which mode is available and defaults to
+PAT with a clear setup note if OAuth is not configured.
 
 ## Roadmap
 
 - **v0.1.x**: 21 skills; multi-tool support (Cursor, Windsurf, Cline);
   SCSS/TS/Tailwind token export; Figma version diff; WCAG 2.2; Plugin API
   correctness rules; showcase preference; icon library detection
-- **v0.2**: skill test suites (eval prompts per skill), example Figma file
-  + walkthrough
-- **v0.3**: theming/multi-brand token modes, CI workflow running
-  validate-extraction + fidelity audits on a schedule
+- **v0.2** ✅: web wizard (7-step UI, multi-provider AI, dark/light theme,
+  Windows + macOS start scripts, GitHub Pages deploy)
+- **v0.3**: skill test suites (eval prompts per skill), example Figma file
+  + walkthrough, theming/multi-brand token modes
 
 ## License & contributing
 
