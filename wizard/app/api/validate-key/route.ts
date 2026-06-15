@@ -10,33 +10,41 @@ export async function POST(req: NextRequest) {
   try {
     if (provider === 'anthropic') {
       const { default: Anthropic } = await import('@anthropic-ai/sdk')
-      const client = new Anthropic({ apiKey })
-      await client.messages.create({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1,
-        messages: [{ role: 'user', content: 'hi' }],
-      })
+      const client = new Anthropic({ apiKey: apiKey.trim() })
+      await client.models.list()
     } else if (provider === 'openai') {
       const res = await fetch('https://api.openai.com/v1/models', {
-        headers: { Authorization: `Bearer ${apiKey}` },
+        headers: { Authorization: `Bearer ${apiKey.trim()}` },
       })
-      if (!res.ok) throw new Error('401')
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw { status: res.status, message: data?.error?.message ?? res.statusText }
+      }
     } else if (provider === 'google') {
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`
+        `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey.trim()}`
       )
-      if (!res.ok) throw new Error('401')
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw { status: res.status, message: data?.error?.message ?? res.statusText }
+      }
     } else if (provider === 'copilot') {
       const res = await fetch('https://api.github.com/user', {
-        headers: { Authorization: `Bearer ${apiKey}`, Accept: 'application/vnd.github+json' },
+        headers: { Authorization: `Bearer ${apiKey.trim()}`, Accept: 'application/vnd.github+json' },
       })
-      if (!res.ok) throw new Error('401')
+      if (!res.ok) {
+        throw { status: res.status, message: res.statusText }
+      }
     }
 
     return NextResponse.json({ valid: true })
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : ''
-    const isAuthErr = msg.includes('401') || msg.includes('invalid') || msg.includes('authentication') || msg.includes('Unauthorized')
-    return NextResponse.json({ error: isAuthErr ? 'Invalid API key' : msg }, { status: 401 })
+  } catch (err: unknown) {
+    const status = (err as { status?: number })?.status ?? 0
+    const message = (err as { message?: string })?.message ?? String(err)
+    const isAuthErr = status === 401 || status === 403
+    return NextResponse.json(
+      { error: isAuthErr ? 'Invalid API key' : (message || 'Validation failed') },
+      { status: 401 }
+    )
   }
 }
