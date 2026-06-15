@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useWizardStore, type AiProvider } from '@/lib/wizard-store'
 import { Button } from '@/components/ui/button'
@@ -88,11 +88,22 @@ export function Step1Connect() {
   const [apiKeyValid, setApiKeyValid] = useState<boolean | null>(null)
   const [apiKeyError, setApiKeyError] = useState('')
 
-  const [figmaMode, setFigmaMode] = useState<FigmaMode>('oauth')
+  const [figmaMode, setFigmaMode] = useState<FigmaMode>('pat')
+  const [oauthAvailable, setOauthAvailable] = useState<boolean | null>(null)
   const [pat, setPat] = useState('')
   const [patError, setPatError] = useState('')
 
   const { setFigmaToken, setAiCredentials, setStepStatus, setCurrentStep } = useWizardStore()
+
+  useEffect(() => {
+    fetch('/api/auth/figma-configured')
+      .then((r) => r.json())
+      .then(({ configured }) => {
+        setOauthAvailable(configured)
+        if (configured) setFigmaMode('oauth')
+      })
+      .catch(() => setOauthAvailable(false))
+  }, [])
   const router = useRouter()
 
   function selectProvider(p: ProviderDef) {
@@ -266,19 +277,21 @@ export function Step1Connect() {
           <span className="text-sm font-medium">Figma access</span>
         </div>
 
-        <div className="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-muted">
-          {(['oauth', 'pat'] as const).map((mode) => (
-            <button key={mode} onClick={() => setFigmaMode(mode)}
-              className={cn(
-                'py-2 rounded-lg text-[13px] font-medium transition-all duration-150',
-                figmaMode === mode ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
-              )}>
-              {mode === 'oauth' ? 'OAuth (recommended)' : 'Personal token'}
-            </button>
-          ))}
-        </div>
+        {oauthAvailable && (
+          <div className="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-muted">
+            {(['oauth', 'pat'] as const).map((mode) => (
+              <button key={mode} onClick={() => setFigmaMode(mode)}
+                className={cn(
+                  'py-2 rounded-lg text-[13px] font-medium transition-all duration-150',
+                  figmaMode === mode ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                )}>
+                {mode === 'oauth' ? 'OAuth (recommended)' : 'Personal token'}
+              </button>
+            ))}
+          </div>
+        )}
 
-        {figmaMode === 'oauth' ? (
+        {figmaMode === 'oauth' && oauthAvailable ? (
           <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
             <div className="flex items-start gap-3">
               <div className="w-9 h-9 rounded-xl bg-[#9747FF]/10 border border-[#9747FF]/20 flex items-center justify-center shrink-0">
@@ -295,6 +308,14 @@ export function Step1Connect() {
           </div>
         ) : (
           <div className={cn('rounded-2xl border bg-card p-4 space-y-3', patError ? 'border-destructive/40' : 'border-border')}>
+            {oauthAvailable === false && (
+              <div className="flex items-start gap-2 rounded-lg bg-blue-50 border border-blue-100 px-3 py-2.5">
+                <AlertCircle className="w-3.5 h-3.5 text-blue-500 shrink-0 mt-0.5" />
+                <p className="text-[11px] text-blue-700 leading-snug">
+                  OAuth not configured — set <code className="font-mono">FIGMA_CLIENT_ID</code>, <code className="font-mono">FIGMA_CLIENT_SECRET</code> and <code className="font-mono">NEXTAUTH_SECRET</code> in <code className="font-mono">wizard/.env.local</code> to enable it.
+                </p>
+              </div>
+            )}
             <div className="flex items-start gap-3">
               <div className="w-9 h-9 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center shrink-0">
                 <Key className="w-4 h-4 text-gray-500" />
