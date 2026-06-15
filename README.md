@@ -152,19 +152,17 @@ prefer a visual workflow.
 
 ### Run locally
 
-```bash
-# From the repo root
-./start-wizard.sh
+| Platform | Command |
+|---|---|
+| macOS / Linux | `./start-wizard.sh` |
+| Windows (cmd) | `start-wizard.bat` |
 
-# Or from wizard/
-cd wizard && ./start-wizard.sh
-```
+Both scripts can be run from the repo root or from `wizard/`. On first run
+they create `wizard/.env.local` from `.env.example`, install dependencies
+if needed, and start the dev server at **http://localhost:3000**.
 
-The script:
-- Creates `wizard/.env.local` from `.env.example` on first run (fill in
-  your keys)
-- Installs `node_modules` if missing
-- Starts the dev server at **http://localhost:3000**
+macOS requires Node.js ≥ 20 (`brew install node`).
+Windows requires Node.js ≥ 20 from [nodejs.org](https://nodejs.org).
 
 ### Environment variables (`wizard/.env.local`)
 
