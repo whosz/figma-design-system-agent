@@ -123,6 +123,61 @@ fixes. If extraction quality is poor, run `figma-readiness-check` (messy
 source) and `validate-extraction` (broken snapshot) to find out which side
 the problem is on.
 
+## Web Wizard
+
+A guided 7-step web UI that runs the agent pipeline without a terminal or
+an AI client — just a browser. Designed for designers and developers who
+prefer a visual workflow.
+
+**Live page:** [whosz.github.io/figma-design-system-agent](https://whosz.github.io/figma-design-system-agent/)
+(landing page only; the wizard itself requires a local backend — see below)
+
+### Steps
+
+1. **Connect** — choose your AI provider (Anthropic, OpenAI, Gemini, or
+   GitHub Copilot) and enter your API key; connect Figma via OAuth or PAT
+2. **Readiness check** — paste your Figma file URL; the wizard streams a
+   full readiness report before continuing
+3. **Profile** — pick output tier, CSS approach, and target devices
+4. **Extract** — streaming token extraction with live counters
+5. **Validate** — cross-checks extraction against live Figma data
+6. **Generate** — per-component code generation with streaming output
+7. **Export** — download ZIP, deploy to GitHub Pages, or export AI
+   instruction files for Cursor / Windsurf / Claude Code
+
+> **Note:** Full AI functionality (streaming, key validation, Figma MCP)
+> requires the wizard to run locally. Only Anthropic supports Figma MCP
+> live integration; other providers show a warning and skip MCP-dependent
+> steps.
+
+### Run locally
+
+```bash
+# From the repo root
+./start-wizard.sh
+
+# Or from wizard/
+cd wizard && ./start-wizard.sh
+```
+
+The script:
+- Creates `wizard/.env.local` from `.env.example` on first run (fill in
+  your keys)
+- Installs `node_modules` if missing
+- Starts the dev server at **http://localhost:3000**
+
+### Environment variables (`wizard/.env.local`)
+
+| Variable | Required | Description |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | optional | Server-side fallback key; users can bring their own in Step 1 |
+| `FIGMA_CLIENT_ID` | for OAuth | From [figma.com/developers/apps](https://www.figma.com/developers/apps) |
+| `FIGMA_CLIENT_SECRET` | for OAuth | Same app |
+| `NEXTAUTH_SECRET` | for OAuth | `openssl rand -base64 32` |
+| `NEXTAUTH_URL` | for OAuth | `http://localhost:3000` (local) or your deploy URL |
+
+PAT (Personal Access Token) mode works without the Figma OAuth variables.
+
 ## Roadmap
 
 - **v0.1.x**: 21 skills; multi-tool support (Cursor, Windsurf, Cline);
