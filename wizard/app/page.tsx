@@ -1,5 +1,4 @@
-import Link from 'next/link'
-import { ArrowRight, Layers, Component, Wand2, Download, ShieldCheck, Zap, Figma } from 'lucide-react'
+import { Download, Layers, Component, ShieldCheck, Zap, Figma } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 const SKILLS = [
@@ -60,13 +59,13 @@ export default function Home() {
           <nav className="hidden md:flex items-center gap-6 text-[13px] text-white/50">
             <a href="#features" className="hover:text-white transition-colors">Features</a>
             <a href="#skills" className="hover:text-white transition-colors">Skills</a>
-            <a href="https://github.com" className="hover:text-white transition-colors">GitHub</a>
+            <a href="https://github.com/whosz/figma-design-system-agent" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">GitHub</a>
           </nav>
-          <Link href="/wizard/1" target="_blank" rel="noopener noreferrer">
-            <Button size="sm" className="h-8 px-4 text-[13px] bg-white text-black hover:bg-white/90 font-medium">
-              Start building
+          <a href="https://github.com/whosz/figma-design-system-agent/releases/latest" target="_blank" rel="noopener noreferrer">
+            <Button size="sm" className="h-8 px-4 text-[13px] bg-white text-black hover:bg-white/90 font-medium gap-1.5">
+              <Download className="w-3 h-3" /> Download
             </Button>
-          </Link>
+          </a>
         </div>
       </header>
 
@@ -92,12 +91,12 @@ export default function Home() {
           </p>
 
           <div className="flex items-center justify-center gap-3 flex-wrap">
-            <Link href="/wizard/1" target="_blank" rel="noopener noreferrer">
+            <a href="https://github.com/whosz/figma-design-system-agent/releases/latest" target="_blank" rel="noopener noreferrer">
               <Button className="h-11 px-6 text-[14px] bg-[#9747FF] hover:bg-[#8035f0] text-white font-medium gap-2">
-                Start for free <ArrowRight className="w-4 h-4" />
+                <Download className="w-4 h-4" /> Download latest release
               </Button>
-            </Link>
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer">
+            </a>
+            <a href="https://github.com/whosz/figma-design-system-agent" target="_blank" rel="noopener noreferrer">
               <Button variant="outline" className="h-11 px-6 text-[14px] border-white/15 bg-white/5 text-white/80 hover:bg-white/10 hover:text-white">
                 View on GitHub
               </Button>
@@ -105,7 +104,7 @@ export default function Home() {
           </div>
 
           <p className="mt-5 text-[12px] text-white/25">
-            Bring your own Anthropic API key · No account required
+            Self-hosted · Open source · MIT License
           </p>
         </div>
 
@@ -201,11 +200,11 @@ export default function Home() {
             ))}
           </div>
 
-          <Link href="/wizard/1" target="_blank" rel="noopener noreferrer">
+          <a href="https://github.com/whosz/figma-design-system-agent/releases/latest" target="_blank" rel="noopener noreferrer">
             <Button className="h-12 px-8 text-[15px] bg-[#9747FF] hover:bg-[#8035f0] text-white font-medium gap-2">
-              Start building your design system <ArrowRight className="w-4 h-4" />
+              <Download className="w-4 h-4" /> Download & run locally
             </Button>
-          </Link>
+          </a>
           <p className="mt-4 text-[12px] text-white/20">Free · Open source · Self-hosted</p>
         </div>
       </section>
