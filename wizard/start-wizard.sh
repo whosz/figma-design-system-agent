@@ -27,5 +27,11 @@ if [ ! -d node_modules ]; then
 fi
 
 # ── Dev server ─────────────────────────────────────────────────────────────────
-echo "Starting wizard at http://localhost:3000"
+echo "Starting wizard — browser will open automatically at http://localhost:3000/wizard/1"
+
+# Poll until the server responds, then open the browser
+(until curl -sf http://localhost:3000 >/dev/null 2>&1; do sleep 0.5; done
+ open "http://localhost:3000/wizard/1" 2>/dev/null || \
+ xdg-open "http://localhost:3000/wizard/1" 2>/dev/null || true) &
+
 npm run dev

@@ -26,5 +26,9 @@ if not exist "node_modules" (
 )
 
 :: ── Dev server ─────────────────────────────────────────────────────────────────
-echo Starting wizard at http://localhost:3000
+echo Starting wizard — browser will open automatically at http://localhost:3000/wizard/1
+
+:: Poll until server responds, then open browser (curl available on Windows 10+)
+start "" cmd /c "for /l %%i in (1,1,60) do (curl -sf http://localhost:3000 >nul 2>&1 && (start http://localhost:3000/wizard/1 & exit /b 0) || timeout /t 1 /nobreak >nul)"
+
 call npm run dev
