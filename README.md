@@ -1,6 +1,6 @@
 # Figma Design System Agent
 
-**v0.2.0** — an AI agent toolkit that turns Figma into working design systems
+**v0.2.1** — an AI agent toolkit that turns Figma into working design systems
 and responsive prototypes, and back again. Works in GitHub Copilot
 (VS Code & cloud), Claude Code, Cursor, Windsurf, Cline, and any
 MCP-capable AI client.
@@ -145,9 +145,13 @@ prefer a visual workflow.
 7. **Export** — download ZIP, deploy to GitHub Pages, or export AI
    instruction files for Cursor / Windsurf / Claude Code
 
-> **Note:** Only Anthropic supports Figma MCP live integration. Other
-> providers (OpenAI, Gemini, Copilot) render a warning and skip
-> MCP-dependent steps.
+> **Figma connection modes** — four options depending on your setup:
+> - **Remote MCP** (default): OAuth token, `mcp.figma.com` — may require a paid Figma plan
+> - **Local MCP** (free): Figma desktop app with Dev Mode MCP enabled → set `FIGMA_MCP_URL=http://127.0.0.1:3845/mcp`
+> - **Community MCP** (free, read+write): [EXDST](https://github.com/exdst/figma-mcp) local server
+> - **REST API** (free, read-only): no MCP needed — works automatically with non-Anthropic providers or via the "Use REST API" toggle in Step 1
+>
+> Click **Connection options** (?) in Step 1 for setup instructions for each mode.
 
 ### Run locally
 
@@ -170,6 +174,7 @@ Requires **Node.js ≥ 20**: `brew install node` (macOS) or
 | Variable | Required | Description |
 |---|---|---|
 | `ANTHROPIC_API_KEY` | optional | Server-side fallback; users can bring their own key in Step 1 |
+| `FIGMA_MCP_URL` | optional | MCP server URL — defaults to `https://mcp.figma.com/mcp`; set to `http://127.0.0.1:3845/mcp` for local MCP |
 | `FIGMA_CLIENT_ID` | for OAuth | From [figma.com/developers/apps](https://www.figma.com/developers/apps) |
 | `FIGMA_CLIENT_SECRET` | for OAuth | Same app |
 | `NEXTAUTH_SECRET` | for OAuth | `openssl rand -base64 32` |
@@ -179,6 +184,11 @@ PAT (Personal Access Token) mode works without the Figma OAuth variables.
 The wizard detects automatically which mode is available and defaults to
 PAT with a clear setup note if OAuth is not configured.
 
+REST API mode (no MCP server) activates automatically when a non-Anthropic
+provider is selected, or manually via the toggle in Step 1. It fetches
+variables, components and styles directly from the Figma REST API — free,
+read-only.
+
 ## Roadmap
 
 - **v0.1.x**: 21 skills; multi-tool support (Cursor, Windsurf, Cline);
@@ -186,6 +196,8 @@ PAT with a clear setup note if OAuth is not configured.
   correctness rules; showcase preference; icon library detection
 - **v0.2** ✅: web wizard (7-step UI, multi-provider AI, dark/light theme,
   Windows + macOS start scripts, GitHub Pages deploy)
+- **v0.2.1** ✅: Figma connection alternatives — Local MCP, Community MCP
+  (EXDST), REST API mode; `FIGMA_MCP_URL` env var; connection modal in wizard
 - **v0.3**: skill test suites (eval prompts per skill), example Figma file
   + walkthrough, theming/multi-brand token modes
 
