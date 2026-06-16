@@ -189,18 +189,6 @@ provider is selected, or manually via the toggle in Step 1. It fetches
 variables, components and styles directly from the Figma REST API — free,
 read-only.
 
-## Roadmap
-
-- **v0.1.x**: 21 skills; multi-tool support (Cursor, Windsurf, Cline);
-  SCSS/TS/Tailwind token export; Figma version diff; WCAG 2.2; Plugin API
-  correctness rules; showcase preference; icon library detection
-- **v0.2** ✅: web wizard (7-step UI, multi-provider AI, dark/light theme,
-  Windows + macOS start scripts, GitHub Pages deploy)
-- **v0.2.1** ✅: Figma connection alternatives — Local MCP, Community MCP
-  (EXDST), REST API mode; `FIGMA_MCP_URL` env var; connection modal in wizard
-- **v0.3**: skill test suites (eval prompts per skill), example Figma file
-  + walkthrough, theming/multi-brand token modes
-
 ## License & contributing
 
 MIT (see `LICENSE`). Issues and PRs welcome — especially additional
