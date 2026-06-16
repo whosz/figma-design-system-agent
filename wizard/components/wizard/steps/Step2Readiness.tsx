@@ -18,7 +18,7 @@ const VERDICT_CFG = {
 }
 
 export function Step2Readiness() {
-  const { figmaToken, aiApiKey, aiProvider, aiModel, figmaFileUrl, setFigmaFileUrl, setStepStatus, setCurrentStep } = useWizardStore()
+  const { figmaToken, aiApiKey, aiProvider, aiModel, figmaDataMode, figmaFileUrl, setFigmaFileUrl, setStepStatus, setCurrentStep } = useWizardStore()
   const [url, setUrl] = useState(figmaFileUrl)
   const [streaming, setStreaming] = useState(false)
   const [output, setOutput] = useState('')
@@ -36,7 +36,7 @@ export function Step2Readiness() {
     const res = await fetch('/api/run-skill', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ skill: 'figma-readiness-check', inputs: { figmaFileUrl: url.trim() }, figmaToken, aiApiKey, aiProvider, aiModel }),
+      body: JSON.stringify({ skill: 'figma-readiness-check', inputs: { figmaFileUrl: url.trim() }, figmaToken, aiApiKey, aiProvider, aiModel, figmaDataMode }),
     })
 
     const reader = res.body?.getReader()

@@ -7,9 +7,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
+import { FigmaConnectionModal } from '@/components/wizard/FigmaConnectionModal'
 import {
   Eye, EyeOff, Figma, Key, ExternalLink,
-  CheckCircle2, AlertCircle, Loader2, ChevronDown,
+  CheckCircle2, AlertCircle, Loader2, ChevronDown, HelpCircle, Code2,
 } from 'lucide-react'
 
 /* ── Provider catalogue ── */
@@ -92,8 +93,9 @@ export function Step1Connect() {
   const [oauthAvailable, setOauthAvailable] = useState<boolean | null>(null)
   const [pat, setPat] = useState('')
   const [patError, setPatError] = useState('')
+  const [showConnectionModal, setShowConnectionModal] = useState(false)
 
-  const { setFigmaToken, setAiCredentials, setStepStatus, setCurrentStep } = useWizardStore()
+  const { setFigmaToken, setAiCredentials, setFigmaDataMode, figmaDataMode, setStepStatus, setCurrentStep } = useWizardStore()
 
   useEffect(() => {
     fetch('/api/auth/figma-configured')
@@ -275,7 +277,22 @@ export function Step1Connect() {
         <div className="flex items-center gap-2.5">
           <span className="w-5 h-5 rounded-md bg-purple-100 text-purple-700 flex items-center justify-center text-[10px] font-bold shrink-0">2</span>
           <span className="text-sm font-medium">Figma access</span>
+          <button
+            type="button"
+            onClick={() => setShowConnectionModal(true)}
+            className="ml-auto flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <HelpCircle className="w-3.5 h-3.5" /> Connection options
+          </button>
         </div>
+
+        {figmaDataMode === 'rest' && (
+          <div className="flex items-center gap-2 rounded-xl bg-blue-50 border border-blue-200 px-3 py-2">
+            <Code2 className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+            <p className="text-[12px] text-blue-700 flex-1">REST API mode active — Figma data fetched without MCP.</p>
+            <button onClick={() => setFigmaDataMode('auto')} className="text-[11px] text-blue-500 hover:text-blue-700 underline shrink-0">Reset</button>
+          </div>
+        )}
 
         {oauthAvailable && (
           <div className="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-muted">
@@ -344,9 +361,25 @@ export function Step1Connect() {
               {validating && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               Continue →
             </Button>
+            {figmaDataMode !== 'rest' && (
+              <button
+                type="button"
+                onClick={() => setFigmaDataMode('rest')}
+                className="w-full text-center text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Code2 className="w-3 h-3 inline-block mr-1" />
+                Use REST API instead of MCP
+              </button>
+            )}
           </div>
         )}
       </section>
+
+      <FigmaConnectionModal
+        open={showConnectionModal}
+        onClose={() => setShowConnectionModal(false)}
+        onSelectRest={() => setFigmaDataMode('rest')}
+      />
     </div>
   )
 }

@@ -16,6 +16,66 @@ Bidirectional design-system workflow between Figma and code:
 - pushes code-born designs back into Figma,
 - audits, documents, measures and publishes everything it produces.
 
+## Figma connection modes
+
+The agent can reach Figma through four different mechanisms. Choose the one
+that fits your setup; everything else in the workflow stays the same.
+
+| Mode | Cost | Requires | Read/Write | Best for |
+|------|------|----------|-----------|----------|
+| **Remote MCP** `mcp.figma.com` | OAuth token (may need paid plan) | Figma OAuth token | Read-only | CI/CD, cloud agents, no desktop |
+| **Local MCP** `127.0.0.1:3845` | Free | Figma desktop app + Dev Mode MCP enabled | Read-only | Local development, no token needed |
+| **Community MCP** (EXDST) | Free, open source | Figma plugin + local server running | Read **+** Write | When you need `code-to-figma` or `code-connect-sync` without a paid plan |
+| **REST API** (wizard only) | Free | Personal Access Token (PAT) | Read-only | Non-Anthropic AI providers; no MCP server available |
+
+### Switching between Remote and Local MCP
+
+Both `.mcp.json` (Claude Code) and `.vscode/mcp.json` (VS Code / Copilot)
+contain two entries — one for each mode. Comment out the one you are not
+using and uncomment the other, then restart your client.
+
+```jsonc
+// .mcp.json — uncomment the mode you want:
+{
+  "mcpServers": {
+    // "figma-local": { "url": "http://127.0.0.1:3845/mcp" },
+    "figma-remote": { "url": "https://mcp.figma.com/mcp" }
+  }
+}
+```
+
+**Local MCP setup** (one-time):
+1. Install the Figma desktop app (free — figma.com/downloads)
+2. Open Figma → Preferences → Enable Dev Mode MCP Server
+3. Switch `.mcp.json` to the local entry and restart your AI client
+4. Run `mcp-doctor` to verify — you should see a green local-server row
+
+### Community MCP (EXDST) — free read+write alternative
+
+The [EXDST community MCP server](https://github.com/exdst/figma-mcp) runs
+locally via a Figma plugin and a WebSocket bridge. It exposes the same
+MCP tool interface as the official server but also allows write operations.
+Use it when you need `code-to-figma` or `code-connect-sync` without a
+remote OAuth token.
+
+**Setup:**
+1. Clone the repo: `git clone https://github.com/exdst/figma-mcp`
+2. Follow the repo's README to install the Figma plugin and start the server
+3. Note the local URL the server reports (typically `ws://localhost:{port}`)
+4. Update `.mcp.json` to point to that URL and restart your AI client
+
+### REST API mode (wizard only)
+
+When running the web wizard without an MCP server, the wizard can fetch
+design data directly from the Figma REST API using the Personal Access
+Token collected in Step 1. This mode activates automatically when a
+non-Anthropic AI provider is selected, or manually via the "Use REST API"
+option in the wizard's Figma connection modal.
+
+Limitations of REST mode: read-only (no `code-to-figma` or
+`code-connect-sync`); no live node screenshots; slightly reduced accuracy
+on `figma-readiness-check`.
+
 ## Repository layout
 
 ```

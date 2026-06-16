@@ -9,7 +9,7 @@ import { CheckCircle2, AlertTriangle, ArrowRight, ShieldCheck } from 'lucide-rea
 import { cn } from '@/lib/utils'
 
 export function Step5Validate() {
-  const { figmaToken, aiApiKey, aiProvider, aiModel, figmaFileUrl, setStepStatus, setCurrentStep } = useWizardStore()
+  const { figmaToken, aiApiKey, aiProvider, aiModel, figmaDataMode, figmaFileUrl, setStepStatus, setCurrentStep } = useWizardStore()
   const [streaming, setStreaming] = useState(false)
   const [output, setOutput] = useState('')
   const [done, setDone] = useState(false)
@@ -24,7 +24,7 @@ export function Step5Validate() {
     const res = await fetch('/api/run-skill', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ skill: 'validate-extraction', inputs: { figmaFileUrl }, figmaToken, aiApiKey, aiProvider, aiModel }),
+      body: JSON.stringify({ skill: 'validate-extraction', inputs: { figmaFileUrl }, figmaToken, aiApiKey, aiProvider, aiModel, figmaDataMode }),
     })
     const reader = res.body?.getReader()
     const decoder = new TextDecoder()

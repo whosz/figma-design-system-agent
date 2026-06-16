@@ -1,5 +1,7 @@
 import fs from 'fs'
 import path from 'path'
+import type { FigmaRestContext } from './figma-rest'
+import { formatFigmaContext } from './figma-rest'
 
 const SKILLS_DIR = path.resolve(process.cwd(), '..', 'skills')
 
@@ -11,7 +13,11 @@ export function buildSystemPrompt(skillName: string): string {
   return fs.readFileSync(skillPath, 'utf-8')
 }
 
-export function buildUserMessage(skillName: string, inputs: Record<string, unknown>): string {
+export function buildUserMessage(
+  skillName: string,
+  inputs: Record<string, unknown>,
+  figmaContext?: FigmaRestContext
+): string {
   const parts: string[] = []
 
   if (inputs.figmaFileUrl) {
@@ -29,6 +35,10 @@ export function buildUserMessage(skillName: string, inputs: Record<string, unkno
 
   if (parts.length === 0) {
     parts.push(`Run the ${skillName} skill.`)
+  }
+
+  if (figmaContext) {
+    parts.push(formatFigmaContext(figmaContext))
   }
 
   return parts.join('\n\n')

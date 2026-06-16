@@ -9,7 +9,7 @@ import { SkillStream } from '@/components/wizard/shared/SkillStream'
 import { Layers, Component, ArrowRight, Sparkles } from 'lucide-react'
 
 export function Step4Extract() {
-  const { figmaToken, aiApiKey, aiProvider, aiModel, figmaFileUrl, profile, setTokenCount, setComponentEntries, setStepStatus, setCurrentStep } = useWizardStore()
+  const { figmaToken, aiApiKey, aiProvider, aiModel, figmaDataMode, figmaFileUrl, profile, setTokenCount, setComponentEntries, setStepStatus, setCurrentStep } = useWizardStore()
   const [streaming, setStreaming] = useState(false)
   const [output, setOutput] = useState('')
   const [done, setDone] = useState(false)
@@ -24,7 +24,7 @@ export function Step4Extract() {
     const res = await fetch('/api/run-skill', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ skill: 'extract-design-system', inputs: { figmaFileUrl, profile }, figmaToken, aiApiKey, aiProvider, aiModel }),
+      body: JSON.stringify({ skill: 'extract-design-system', inputs: { figmaFileUrl, profile }, figmaToken, aiApiKey, aiProvider, aiModel, figmaDataMode }),
     })
     const reader = res.body?.getReader()
     const decoder = new TextDecoder()

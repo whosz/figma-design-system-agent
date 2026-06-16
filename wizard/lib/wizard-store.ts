@@ -32,6 +32,8 @@ export interface TokenOverride {
   newValue: string
 }
 
+export type FigmaDataMode = 'auto' | 'mcp' | 'rest'
+
 interface WizardState {
   // Auth
   figmaToken: string | null
@@ -39,6 +41,7 @@ interface WizardState {
   aiProvider: AiProvider
   aiApiKey: string | null
   aiModel: string | null
+  figmaDataMode: FigmaDataMode
 
   // File
   figmaFileUrl: string
@@ -61,6 +64,7 @@ interface WizardState {
   // Actions
   setFigmaToken: (token: string, type: 'oauth' | 'pat') => void
   setAiCredentials: (provider: AiProvider, key: string, model: string) => void
+  setFigmaDataMode: (mode: FigmaDataMode) => void
   setFigmaFileUrl: (url: string) => void
   setProfile: (profile: Partial<TargetProfile>) => void
   setTokenCount: (count: number) => void
@@ -91,6 +95,7 @@ export const useWizardStore = create<WizardState>()(
       aiProvider: 'anthropic',
       aiApiKey: null,
       aiModel: null,
+      figmaDataMode: 'auto' as FigmaDataMode,
       figmaFileUrl: '',
       profile: defaultProfile,
       tokenCount: 0,
@@ -102,6 +107,7 @@ export const useWizardStore = create<WizardState>()(
 
       setFigmaToken: (token, type) => set({ figmaToken: token, figmaTokenType: type }),
       setAiCredentials: (provider, key, model) => set({ aiProvider: provider, aiApiKey: key, aiModel: model }),
+      setFigmaDataMode: (mode) => set({ figmaDataMode: mode }),
       setFigmaFileUrl: (url) => set({ figmaFileUrl: url }),
       setProfile: (partial) => set((s) => ({ profile: { ...s.profile, ...partial } })),
       setTokenCount: (count) => set({ tokenCount: count }),
@@ -143,6 +149,7 @@ export const useWizardStore = create<WizardState>()(
           aiProvider: 'anthropic',
           aiApiKey: null,
           aiModel: null,
+          figmaDataMode: 'auto',
           figmaFileUrl: '',
           profile: defaultProfile,
           tokenCount: 0,

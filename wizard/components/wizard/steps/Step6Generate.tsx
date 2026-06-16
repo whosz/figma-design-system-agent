@@ -18,7 +18,7 @@ const DEMO_COMPONENTS = [
 ]
 
 export function Step6Generate() {
-  const { figmaToken, aiApiKey, aiProvider, aiModel, figmaFileUrl, profile, markComponentGenerated, setStepStatus, setCurrentStep } = useWizardStore()
+  const { figmaToken, aiApiKey, aiProvider, aiModel, figmaDataMode, figmaFileUrl, profile, markComponentGenerated, setStepStatus, setCurrentStep } = useWizardStore()
   const [selected, setSelected] = useState<Set<string>>(new Set(DEMO_COMPONENTS.map((c) => c.id)))
   const [generating, setGenerating] = useState<string | null>(null)
   const [generated, setGenerated] = useState<Set<string>>(new Set())
@@ -38,7 +38,7 @@ export function Step6Generate() {
       const res = await fetch('/api/run-skill', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ skill: 'generate-component', inputs: { component: comp.name, figmaFileUrl, profile }, figmaToken, aiApiKey, aiProvider, aiModel }),
+        body: JSON.stringify({ skill: 'generate-component', inputs: { component: comp.name, figmaFileUrl, profile }, figmaToken, aiApiKey, aiProvider, aiModel, figmaDataMode }),
       })
       const reader = res.body?.getReader()
       const decoder = new TextDecoder()
