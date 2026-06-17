@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils'
 import { FigmaConnectionModal } from '@/components/wizard/FigmaConnectionModal'
 import {
   Eye, EyeOff, Figma, Key, ExternalLink,
-  CheckCircle2, AlertCircle, Loader2, ChevronDown, HelpCircle, Code2,
+  CheckCircle2, AlertCircle, Loader2, ChevronDown, HelpCircle, Code2, Cloud,
 } from 'lucide-react'
 
 /* ── Provider catalogue ── */
@@ -88,6 +88,8 @@ export function Step1Connect() {
   const [validating, setValidating] = useState(false)
   const [apiKeyValid, setApiKeyValid] = useState<boolean | null>(null)
   const [apiKeyError, setApiKeyError] = useState('')
+  const [serverKeyAvailable, setServerKeyAvailable] = useState(false)
+  const [usingServerKey, setUsingServerKey] = useState(false)
 
   const [figmaMode, setFigmaMode] = useState<FigmaMode>('pat')
   const [oauthAvailable, setOauthAvailable] = useState<boolean | null>(null)
@@ -105,6 +107,13 @@ export function Step1Connect() {
         if (configured) setFigmaMode('oauth')
       })
       .catch(() => setOauthAvailable(false))
+
+    fetch('/api/anthropic-configured')
+      .then((r) => r.json())
+      .then(({ configured }) => {
+        if (configured) setServerKeyAvailable(true)
+      })
+      .catch(() => {})
   }, [])
   const router = useRouter()
 
@@ -114,6 +123,9 @@ export function Step1Connect() {
     setApiKey('')
     setApiKeyValid(null)
     setApiKeyError('')
+    setUsingServerKey(false)
+    if (!p.mcp) setFigmaDataMode('rest')
+    else if (figmaDataMode === 'rest') setFigmaDataMode('auto')
   }
 
   async function validateKey(key: string): Promise<boolean> {
@@ -150,15 +162,15 @@ export function Step1Connect() {
   }
 
   async function handleContinuePAT() {
-    let hasError = false
-    if (!apiKey.trim()) { setApiKeyError('Required'); hasError = true }
-    if (!pat.trim()) { setPatError('Required'); hasError = true }
-    if (hasError) return
+    if (!pat.trim()) { setPatError('Required'); return }
 
-    const valid = await validateKey(apiKey.trim())
-    if (!valid) return
+    if (!usingServerKey) {
+      if (!apiKey.trim()) { setApiKeyError('Required'); return }
+      const valid = await validateKey(apiKey.trim())
+      if (!valid) return
+    }
 
-    setAiCredentials(provider.id, apiKey.trim(), model)
+    setAiCredentials(provider.id, usingServerKey ? '' : apiKey.trim(), model)
     setFigmaToken(pat.trim(), 'pat')
     setStepStatus(1, 'done')
     setCurrentStep(2)
@@ -203,18 +215,41 @@ export function Step1Connect() {
         </div>
 
         {!provider.mcp && (
-          <div className="flex items-start gap-2 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3">
-            <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-            <p className="text-[12px] text-amber-700 leading-snug">
-              <strong>{provider.name}</strong> does not support Figma MCP live integration.
-              Skills that read Figma directly will be unavailable.
-              Switch to <button onClick={() => selectProvider(PROVIDERS[0])} className="underline font-medium">Anthropic</button> for full functionality.
+          <div className="flex items-start gap-2 rounded-xl bg-green-50 border border-green-200 px-4 py-3">
+            <CheckCircle2 className="w-4 h-4 text-green-600 shrink-0 mt-0.5" />
+            <p className="text-[12px] text-green-800 leading-snug">
+              <strong>{provider.name}</strong> uses <strong>Figma REST API mode</strong> — no Anthropic credits, no Figma MCP plan needed. Figma data is fetched with your free PAT. Read-only skills only.
             </p>
           </div>
         )}
 
+        {/* Server key banner */}
+        {serverKeyAvailable && provider.mcp && (
+          <button
+            type="button"
+            onClick={() => { setUsingServerKey(!usingServerKey); setApiKeyError('') }}
+            className={cn(
+              'w-full flex items-center gap-2.5 rounded-xl border px-4 py-2.5 text-left transition-colors',
+              usingServerKey
+                ? 'bg-green-50 border-green-300 text-green-800'
+                : 'bg-muted border-border text-muted-foreground hover:text-foreground'
+            )}
+          >
+            <CheckCircle2 className={cn('w-4 h-4 shrink-0', usingServerKey ? 'text-green-600' : 'text-muted-foreground')} />
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-medium leading-none">
+                {usingServerKey ? 'Using server-configured Anthropic key' : 'Use Anthropic key from this environment'}
+              </p>
+              <p className="text-[11px] mt-0.5 opacity-70">ANTHROPIC_API_KEY is set in wizard/.env.local</p>
+            </div>
+            <span className={cn('text-[11px] font-medium shrink-0', usingServerKey ? 'text-green-600' : '')}>
+              {usingServerKey ? 'Active ✓' : 'Use it'}
+            </span>
+          </button>
+        )}
+
         {/* Key input */}
-        <div className={cn(
+        {!usingServerKey && <div className={cn(
           'rounded-2xl border bg-card p-4 space-y-3 transition-colors',
           apiKeyError ? 'border-destructive/40' : 'border-border'
         )}>
@@ -252,7 +287,7 @@ export function Step1Connect() {
               <AlertCircle className="w-3 h-3 shrink-0" />{apiKeyError}
             </p>
           )}
-        </div>
+        </div>}
 
         {/* Model selector */}
         <div className="space-y-1.5">
@@ -282,19 +317,46 @@ export function Step1Connect() {
             onClick={() => setShowConnectionModal(true)}
             className="ml-auto flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
           >
-            <HelpCircle className="w-3.5 h-3.5" /> Connection options
+            <HelpCircle className="w-3.5 h-3.5" /> Help
           </button>
         </div>
 
+        {/* Connection mode selector */}
+        <div className="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-muted">
+          {([
+            { mode: 'mcp',  label: 'Remote MCP', icon: Cloud },
+            { mode: 'rest', label: 'REST API',   icon: Code2 },
+          ] as const).map(({ mode, label, icon: Icon }) => {
+            const active = figmaDataMode === mode || (figmaDataMode === 'auto' && mode === 'mcp')
+            const disabled = mode === 'mcp' && !provider.mcp
+            return (
+              <button
+                key={mode}
+                onClick={() => !disabled && setFigmaDataMode(mode)}
+                disabled={disabled}
+                title={disabled ? 'Remote MCP requires Anthropic' : undefined}
+                className={cn(
+                  'flex items-center justify-center gap-1.5 py-2 rounded-lg text-[13px] font-medium transition-all duration-150',
+                  active ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground',
+                  disabled && 'opacity-40 cursor-not-allowed'
+                )}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                {label}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* REST API notice */}
         {figmaDataMode === 'rest' && (
-          <div className="flex items-center gap-2 rounded-xl bg-blue-50 border border-blue-200 px-3 py-2">
-            <Code2 className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-            <p className="text-[12px] text-blue-700 flex-1">REST API mode active — Figma data fetched without MCP.</p>
-            <button onClick={() => setFigmaDataMode('auto')} className="text-[11px] text-blue-500 hover:text-blue-700 underline shrink-0">Reset</button>
-          </div>
+          <p className="text-[11px] text-muted-foreground px-1">
+            PAT used to call Figma REST API directly. Works with any AI provider. Read-only — write skills unavailable.
+          </p>
         )}
 
-        {oauthAvailable && (
+        {/* Auth method tabs (MCP mode only) */}
+        {figmaDataMode !== 'rest' && oauthAvailable && (
           <div className="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-muted">
             {(['oauth', 'pat'] as const).map((mode) => (
               <button key={mode} onClick={() => setFigmaMode(mode)}
@@ -308,7 +370,8 @@ export function Step1Connect() {
           </div>
         )}
 
-        {figmaMode === 'oauth' && oauthAvailable ? (
+        {/* OAuth card */}
+        {figmaDataMode !== 'rest' && figmaMode === 'oauth' && oauthAvailable ? (
           <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
             <div className="flex items-start gap-3">
               <div className="w-9 h-9 rounded-xl bg-[#9747FF]/10 border border-[#9747FF]/20 flex items-center justify-center shrink-0">
@@ -324,8 +387,9 @@ export function Step1Connect() {
             </Button>
           </div>
         ) : (
+          /* PAT card — shown for MCP+PAT and REST */
           <div className={cn('rounded-2xl border bg-card p-4 space-y-3', patError ? 'border-destructive/40' : 'border-border')}>
-            {oauthAvailable === false && (
+            {figmaDataMode !== 'rest' && oauthAvailable === false && (
               <div className="flex items-start gap-2 rounded-lg bg-blue-50 border border-blue-100 px-3 py-2.5">
                 <AlertCircle className="w-3.5 h-3.5 text-blue-500 shrink-0 mt-0.5" />
                 <p className="text-[11px] text-blue-700 leading-snug">
@@ -361,16 +425,6 @@ export function Step1Connect() {
               {validating && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               Continue →
             </Button>
-            {figmaDataMode !== 'rest' && (
-              <button
-                type="button"
-                onClick={() => setFigmaDataMode('rest')}
-                className="w-full text-center text-[11px] text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <Code2 className="w-3 h-3 inline-block mr-1" />
-                Use REST API instead of MCP
-              </button>
-            )}
           </div>
         )}
       </section>
