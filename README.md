@@ -90,6 +90,9 @@ what to re-extract before regenerating.
 | `extract-app-flows` | read prototype flows / FigJam → flow graph → wired app | ✅ |
 | `knowledge-ingest` | ingest SharePoint / Confluence / Drive / Miro docs | ✅ |
 | `validate-extraction` | verify extracted data vs. live Figma, incl. all states | ✅ |
+| `ds-naming-audit` | detect naming mismatches Figma ↔ code; typos, aliases, conventions | ✅ |
+| `ds-gap-analysis` | 3-bucket coverage: Figma-only (implement), Code-only (document), Both (verify) | ✅ |
+| `ds-checklist` | generate & manage prioritised DS alignment task list by category | ✅ |
 | `generate-component` | Figma component → code component, all states; auto-updates gallery | ✅ |
 | `build-rwd-prototype` | compose responsive prototypes from components | ✅ |
 | `docs-to-prototype` | prototypes from notes/boards when no design exists | ✅ |

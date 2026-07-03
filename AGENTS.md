@@ -156,6 +156,9 @@ on `figma-readiness-check`.
 | 1 Extract | `extract-app-flows` | prototype interactions / FigJam → flow graphs |
 | 1 Extract | `knowledge-ingest` | SharePoint/Confluence/Drive/Miro docs → knowledge cache |
 | 1 Extract | `validate-extraction` | verify extracted data vs. live Figma (incl. state matrix) |
+| 1.5 Align | `ds-naming-audit` | detect & document naming mismatches Figma ↔ code; write alias map |
+| 1.5 Align | `ds-gap-analysis` | 3-bucket coverage report: Figma-only / Code-only / Both |
+| 1.5 Align | `ds-checklist` | generate & manage prioritised DS alignment task list |
 | 2 Generate | `generate-component` | Figma component → code component (all states) |
 | 2 Generate | `build-rwd-prototype` | compose responsive prototypes from components |
 | 2 Generate | `docs-to-prototype` | prototypes from documentation when no design exists |
@@ -268,6 +271,10 @@ once after extraction or component generation to refresh the IDE context file.
   `knowledge-ingest` → `docs-to-prototype` → `code-to-figma` (close the
   loop) → `design-fidelity-audit`
 - **Code-first project**:
+- **DS alignment sprint** (existing Figma DS + existing codebase):
+  `ds-naming-audit` (resolve aliases) → `ds-gap-analysis` (3-bucket coverage) →
+  `ds-checklist` (generate task list) → `generate-component` (Bucket A items) →
+  `code-to-figma` (Bucket B items) → `design-fidelity-audit` (Bucket C items)
   `adopt-component-repo` → `code-to-figma` → `code-connect-sync`
 - **Milestone wrap-up**:
   `docs-and-metrics` → `showcase-pages` → `publish-prototype` (showcase)
