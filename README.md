@@ -77,32 +77,66 @@ what to re-extract before regenerating.
 
 ## Skill catalog
 
-| Skill | What it does | Status |
-|---|---|---|
-| `mcp-doctor` | diagnose & smoke-test MCP connections | ✅ |
-| `target-profile-setup` | choose output tech + target devices, persist as profile | ✅ |
-| `adopt-component-repo` | use an existing code library as the default DS | ✅ |
-| `figma-readiness-check` | audit Figma file quality; detect dedicated component/variable pages | ✅ |
-| `detect-icon-library` | find icon library in Figma or code; ask for link if not found | ✅ |
-| `design-system-search` | natural-language queries over extracted tokens & components | ✅ |
-| `figma-version-diff` | diff live Figma vs. last extraction; changelog before re-run | ✅ |
-| `extract-design-system` | tokens → CSS/SCSS/TS/Tailwind + component inventory + descriptions | ✅ |
-| `extract-app-flows` | read prototype flows / FigJam → flow graph → wired app | ✅ |
-| `knowledge-ingest` | ingest SharePoint / Confluence / Drive / Miro docs | ✅ |
-| `validate-extraction` | verify extracted data vs. live Figma, incl. all states | ✅ |
-| `ds-naming-audit` | detect naming mismatches Figma ↔ code; typos, aliases, conventions | ✅ |
-| `ds-gap-analysis` | 3-bucket coverage: Figma-only (implement), Code-only (document), Both (verify) | ✅ |
-| `ds-checklist` | generate & manage prioritised DS alignment task list by category | ✅ |
-| `generate-component` | Figma component → code component, all states; auto-updates gallery | ✅ |
-| `build-rwd-prototype` | compose responsive prototypes from components | ✅ |
-| `docs-to-prototype` | prototypes from notes/boards when no design exists | ✅ |
-| `code-to-figma` | push prototypes/components back into Figma | ✅ |
-| `design-fidelity-audit` | implementation vs. design, severity-graded report | ✅ |
-| `code-connect-sync` | map Figma components ↔ code (on demand) | ✅ |
-| `publish-prototype` | serverless `file://` bundle + optional online deploy | ✅ |
-| `showcase-pages` | single-page component gallery + project summary page | ✅ |
-| `docs-and-metrics` | docs, token usage stats, time & token metrics | ✅ |
-| `export-ide-context` | design system → `.designrules.md` for Cursor/Windsurf @file | ✅ |
+### Setup & diagnostics
+Run these first — before extraction, generation, or long pipelines.
+
+| Skill | What it does |
+|---|---|
+| `mcp-doctor` | Diagnose & smoke-test MCP connections; offer alternatives when MCP unavailable |
+| `target-profile-setup` | Choose output tech + target devices; persist as `target-profile.json` |
+| `adopt-component-repo` | Adopt an existing component library as the default DS (skips regeneration) |
+| `figma-readiness-check` | Audit Figma file structure before extraction; returns a designer-friendly fix list |
+| `detect-icon-library` | Identify icon library used in Figma and/or code; flag mismatches |
+| `design-system-search` | Natural-language queries over extracted tokens & components |
+
+### Extraction
+Pull design data from Figma into the local design system.
+
+| Skill | What it does |
+|---|---|
+| `figma-version-diff` | Diff live Figma vs. last extraction; scoped changelog before re-run |
+| `extract-design-system` | Figma variables → tokens (CSS / SCSS / TS / Tailwind) + full component inventory |
+| `extract-app-flows` | Prototype interactions / FigJam → flow graphs → wired app skeleton |
+| `knowledge-ingest` | Ingest SharePoint / Confluence / Drive / Miro docs into knowledge cache |
+| `validate-extraction` | Cross-check extracted data against live Figma, incl. all interaction states |
+
+### DS alignment
+Bridge the gap between an existing Figma DS and an existing codebase.
+Run in order: naming → gap → checklist.
+
+| Skill | What it does |
+|---|---|
+| `ds-naming-audit` | Detect naming mismatches Figma ↔ code: typos, semantic aliases, convention differences; writes alias map |
+| `ds-gap-analysis` | 3-bucket coverage report — Figma-only (implement), Code-only (document in Figma), Both (verify) |
+| `ds-checklist` | Generate & manage a prioritised task list: naming / tokens / Figma→Code / Code→Figma / tweaks |
+
+### Generation
+Produce code or Figma designs from extracted data or documentation.
+
+| Skill | What it does |
+|---|---|
+| `generate-component` | Figma component → code component, all states; auto-updates showcase gallery |
+| `build-rwd-prototype` | Compose responsive prototypes from generated components |
+| `docs-to-prototype` | Build prototypes from workshop notes or docs when no Figma design exists |
+| `code-to-figma` | Push prototypes / components back into Figma (reverse direction) |
+
+### Quality
+Verify, audit, and connect implementations to their Figma sources.
+
+| Skill | What it does |
+|---|---|
+| `design-fidelity-audit` | Compare implementation vs. Figma design; severity-graded discrepancy report |
+| `code-connect-sync` | Map Figma components ↔ code components via Code Connect (gated publish) |
+
+### Output & delivery
+Package, publish, and export the finished design system.
+
+| Skill | What it does |
+|---|---|
+| `publish-prototype` | Serverless `file://` bundle + optional online deploy |
+| `showcase-pages` | Single-page component gallery + project summary page |
+| `docs-and-metrics` | Docs, token usage stats, time & LLM-token effort metrics |
+| `export-ide-context` | Design system → `.designrules.md` for Cursor / Windsurf / Claude Code `@file` |
 
 ## The guarantees (short version of AGENTS.md)
 
