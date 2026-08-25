@@ -1,6 +1,6 @@
 # Figma Design System Agent
 
-**v0.3.0** — an AI agent toolkit that turns Figma into working design systems
+**v0.3.1** — an AI agent toolkit that turns Figma into working design systems
 and responsive prototypes, and back again. Works in GitHub Copilot
 (VS Code & cloud), Claude Code, Cursor, Windsurf, Cline, and any
 MCP-capable AI client.
