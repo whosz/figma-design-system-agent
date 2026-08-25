@@ -140,35 +140,74 @@ on `figma-readiness-check`.
 11. **Generated docs are views.** Documentation, showcase pages and reports
     are regenerable from artifacts and marked as generated; truth is edited
     in the artifacts, not in the views.
+12. **Model tier by task shape.** Three tiers; Sonnet is the fallback when
+    a skill doesn't clearly belong to the other two:
+    - **Opus-class** (Claude Opus 5, or the strongest reasoning/vision-
+      capable model in a non-Claude tool) — skills whose core work is
+      scanning/interpreting images (Figma screenshots, visual diffing) or
+      open-ended multi-step planning (architecture/adoption decisions,
+      generation from ambiguous docs).
+    - **Haiku-class** (Claude Haiku 4.5, or the fastest/cheapest model in a
+      non-Claude tool) — skills whose core work is mechanical and
+      low-judgment: running predefined checks, packaging/deploying
+      artifacts, or templating already-produced structured data into a
+      fixed output format, with no interpretive or comparative judgment
+      involved.
+    - **Sonnet-class** (Claude Sonnet 5, or the equivalent mid-tier model)
+      — text/structured-data review, checking code or naming against a
+      spec, and anything not clearly mechanical enough for Haiku or
+      visual/open-ended enough for Opus.
+
+    Assignments are in the `Model` column below; switch models — or
+    dispatch a subagent pinned to the right tier where the tool supports
+    it (e.g. Claude Code's `.claude/agents/*.md` `model:` field) — before
+    running a skill that calls for a different tier.
+13. **Greenfield pages get a craft layer, not a free-for-all.** When a
+    page-generation request has no Figma-sourced design system yet for
+    this project (`design-system/tokens/` empty, `extract-design-system`
+    never run) — this is `docs-to-prototype`'s normal case — check whether
+    the `interface-design` skill/plugin is available
+    (`~/.claude/skills/interface-design`, `.claude/skills/interface-design`,
+    or the Claude Code plugin `Dammyjay93/interface-design`). If present,
+    use it as the default builder for page-level craft decisions the
+    absent DS can't supply — hierarchy, spacing rhythm, depth — recorded in
+    its own `.interface-design/system.md`. If absent, propose installing it
+    once per project (not on every run):
+    `npx skills add https://github.com/Dammyjay93/interface-design --skill interface-design --agent claude-code -g`
+    (or `/plugin marketplace add Dammyjay93/interface-design` via Claude
+    Code's plugin flow). The moment a real Figma DS exists for the
+    project, this rule stops applying: `build-rwd-prototype`'s DS-only
+    rules (rules 1 and 3) take back over, and `interface-design` never
+    overrides a token or component that already exists.
 
 ## Skills by phase
 
-| Phase | Skill | Purpose |
-|---|---|---|
-| 0 Setup | `mcp-doctor` | test MCP connections (run first on errors / long pipelines) |
-| 0 Setup | `target-profile-setup` | decide output tech + target devices, persist profile |
-| 0 Setup | `adopt-component-repo` | adopt an existing code library as default DS |
-| 0 Setup | `figma-readiness-check` | audit the Figma file before first extraction |
-| 0 Setup | `detect-icon-library` | find icon library in Figma/code; ask for link if not found |
-| 0 Setup | `design-system-search` | natural-language queries over extracted tokens & components |
-| 1 Extract | `figma-version-diff` | diff live Figma vs. last extraction; changelog before re-run |
-| 1 Extract | `extract-design-system` | Figma variables → tokens (CSS/SCSS/TS/Tailwind); component inventory |
-| 1 Extract | `extract-app-flows` | prototype interactions / FigJam → flow graphs |
-| 1 Extract | `knowledge-ingest` | SharePoint/Confluence/Drive/Miro docs → knowledge cache |
-| 1 Extract | `validate-extraction` | verify extracted data vs. live Figma (incl. state matrix) |
-| 1.5 Align | `ds-naming-audit` | detect & document naming mismatches Figma ↔ code; write alias map |
-| 1.5 Align | `ds-gap-analysis` | 3-bucket coverage report: Figma-only / Code-only / Both |
-| 1.5 Align | `ds-checklist` | generate & manage prioritised DS alignment task list |
-| 2 Generate | `generate-component` | Figma component → code component (all states) |
-| 2 Generate | `build-rwd-prototype` | compose responsive prototypes from components |
-| 2 Generate | `docs-to-prototype` | prototypes from documentation when no design exists |
-| 2 Generate | `code-to-figma` | prototypes/components → Figma designs (reverse direction) |
-| 3 Quality | `design-fidelity-audit` | implementation vs. Figma design, severity-graded |
-| 3 Quality | `code-connect-sync` | link Figma components ↔ code (on demand, gated publish) |
-| 4 Output | `publish-prototype` | serverless `file://` bundle + optional online deploy |
-| 4 Output | `showcase-pages` | component gallery page + project summary page |
-| 4 Output | `docs-and-metrics` | docs, token usage stats, time & LLM-token metrics |
-| 4 Output | `export-ide-context` | design system → `.designrules.md` for Cursor/Windsurf/@file |
+| Phase | Skill | Purpose | Model |
+|---|---|---|---|
+| 0 Setup | `mcp-doctor` | test MCP connections (run first on errors / long pipelines) | Haiku |
+| 0 Setup | `target-profile-setup` | decide output tech + target devices, persist profile | Sonnet |
+| 0 Setup | `adopt-component-repo` | adopt an existing code library as default DS | Opus |
+| 0 Setup | `figma-readiness-check` | audit the Figma file before first extraction | Opus |
+| 0 Setup | `detect-icon-library` | find icon library in Figma/code; ask for link if not found | Opus |
+| 0 Setup | `design-system-search` | natural-language queries over extracted tokens & components | Sonnet |
+| 1 Extract | `figma-version-diff` | diff live Figma vs. last extraction; changelog before re-run | Opus |
+| 1 Extract | `extract-design-system` | Figma variables → tokens (CSS/SCSS/TS/Tailwind); component inventory | Opus |
+| 1 Extract | `extract-app-flows` | prototype interactions / FigJam → flow graphs | Opus |
+| 1 Extract | `knowledge-ingest` | SharePoint/Confluence/Drive/Miro docs → knowledge cache | Sonnet |
+| 1 Extract | `validate-extraction` | verify extracted data vs. live Figma (incl. state matrix) | Opus |
+| 1.5 Align | `ds-naming-audit` | detect & document naming mismatches Figma ↔ code; write alias map | Sonnet |
+| 1.5 Align | `ds-gap-analysis` | 3-bucket coverage report: Figma-only / Code-only / Both | Sonnet |
+| 1.5 Align | `ds-checklist` | generate & manage prioritised DS alignment task list | Sonnet |
+| 2 Generate | `generate-component` | Figma component → code component (all states) | Opus |
+| 2 Generate | `build-rwd-prototype` | compose responsive prototypes from components | Opus |
+| 2 Generate | `docs-to-prototype` | prototypes from documentation when no design exists | Opus |
+| 2 Generate | `code-to-figma` | prototypes/components → Figma designs (reverse direction) | Opus |
+| 3 Quality | `design-fidelity-audit` | implementation vs. Figma design, severity-graded | Opus |
+| 3 Quality | `code-connect-sync` | link Figma components ↔ code (on demand, gated publish) | Sonnet |
+| 4 Output | `publish-prototype` | serverless `file://` bundle + optional online deploy | Haiku |
+| 4 Output | `showcase-pages` | component gallery page + project summary page | Haiku |
+| 4 Output | `docs-and-metrics` | docs, token usage stats, time & LLM-token metrics | Sonnet |
+| 4 Output | `export-ide-context` | design system → `.designrules.md` for Cursor/Windsurf/@file | Haiku |
 
 ## Dependency graph
 

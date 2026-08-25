@@ -64,6 +64,9 @@ For every screen element in the brief, resolve against
   inline within the prototype, mark it `data-ds-gap="<name>"` in the markup,
   and add it to the *DS gap list* — the user decides later whether to promote
   gaps into real components via `generate-component`.
+- No design system at all yet for this project → that's AGENTS.md's
+  page-craft-layer rule (global rule 13): check for the `interface-design`
+  skill/plugin before inventing layout/hierarchy decisions from scratch.
 
 Tokens-only styling applies exactly as in `build-rwd-prototype` (this skill
 delegates layout/breakpoint mechanics to that skill's rules rather than
